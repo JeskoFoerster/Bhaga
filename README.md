@@ -12,6 +12,7 @@ Der Name "Bhaga" wurde gewählt, da "Bhaga" eine Figur aus der indischen Mytholo
 
 - Jesko Förster
 - Nils Morczinietz
+- Tom Demuth
 
 ## Beiträge
 
