@@ -20,7 +20,7 @@ int main() {
     printf("Color of apple after deletion: %s\n", map_get(map, "apple"));
 
     // Destroy the map and free memory
-    map_destroy(map)ad
+    map_destroy(map);
 
     printf("Main terminated\n");
     return 0;
