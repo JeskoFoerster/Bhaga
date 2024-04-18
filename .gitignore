@@ -1,5 +1,7 @@
 # Project exclude paths
+/cmake-build-debug/
 .idea
 /cmake-build-debug/
 /cmake-build-debuglokal/
 /cmake-build-dockerbhaga/
+/cmake-build-ubuntu_prakbs24
