@@ -8,4 +8,6 @@ add_executable(Bhaga main.c
         keyValStore.c
         keyValStore.h
         sub.c
-        sub.h)
+        sub.h
+        map.c
+        map.h)
