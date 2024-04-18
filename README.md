@@ -11,6 +11,7 @@ Der Name "Bhaga" wurde gewählt, da "Bhaga" eine Figur aus der indischen Mytholo
 ## Teammitglieder
 
 - Jesko Förster
+- Nils Morczinietz
 
 ## Beiträge
 
