@@ -8,16 +8,16 @@ int main() {
     struct Map* map = map_create();
 
     //insert
-    map_insert(map, "apple", "red");
+    map_insert_element(map, "apple", "red");
 
     //get
-    printf("Color of apple: %s\n", map_get(map, "apple"));
+    printf("Color of apple: %s\n", map_get_element(map, "apple"));
 
     //delete
-    map_delete(map, "apple");
+    map_delete_element(map, "apple");
 
     //get
-    printf("Color of apple after deletion: %s\n", map_get(map, "apple"));
+    printf("Color of apple after deletion: %s\n", map_get_element(map, "apple"));
 
     // Destroy the map and free memory
     map_destroy(map);
