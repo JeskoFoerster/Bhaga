@@ -46,11 +46,11 @@ struct Map* map_create() {
 }
 
 
-bool map_insert_element(struct Map* map, const char* key, const char* value) {
+void map_insert_element(struct Map* map, const char* key, const char* value) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
-        printf("Key is a nullptr! Unable to create entry.");
-        return false;
+        printf("Key is a nullptr! Unable to create entry.\n");
+        exit(1);
     }
 
     unsigned int index = hash(key);
@@ -68,11 +68,16 @@ bool map_insert_element(struct Map* map, const char* key, const char* value) {
     } else {
         map->table[index] = pair;
     }
-    return true;
 }
 
 
 const char* map_get_element(struct Map* map, const char* key) {
+    //catch nullptr here because in the map NULL means not set
+    if(key == NULL){
+        printf("Key is a nullptr! Unable to create entry.\n");
+        exit(1);
+    }
+
     unsigned int index = hash(key);
     struct KeyValuePair* current = map->table[index];
 
@@ -90,11 +95,11 @@ const char* map_get_element(struct Map* map, const char* key) {
 }
 
 
-bool map_delete_element(struct Map* map, const char* key) {
+void map_delete_element(struct Map* map, const char* key) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
-        printf("Key is a nullptr! Unable to create entry.");
-        return false;
+        printf("Key is a nullptr! Unable to create entry.\n");
+        exit(1);
     }
 
     unsigned int index = hash(key);
@@ -117,14 +122,12 @@ bool map_delete_element(struct Map* map, const char* key) {
             free(current->key);
             free(current->value);
             free(current);
-            return true;
+            return;
         }
         // Move to the nextPair pair in the chain
         previous = current;
         current = current->nextPair;
     }
-    //its was not there, so you can say it was removed.
-    return true;
 }
 
 
