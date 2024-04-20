@@ -26,17 +26,21 @@ unsigned int hash(const char* key);
 
 struct KeyValuePair* create_key_value_pair(const char* key, const char* value);
 
-struct Map* map_create();
+typedef struct _Map {
+    struct KeyValuePair* table[MAP_SIZE];
+} Map;
 
-void map_insert_element(struct Map* map, const char* key, const char* value);
+Map* map_create();
+
+void map_insert_element(Map* map, const char* key, const char* value);
 
 /**
  * @return The value associated with the key, or NULL if not found.
  */
-const char* map_get_element(struct Map* map, const char* key);
+const char* map_get_element(Map* map, const char* key);
 
-void map_delete_element(struct Map* map, const char* key);
+void map_delete_element(Map* map, const char* key);
 
-void map_destroy(struct Map* map);
+void map_destroy(Map* map);
 
 #endif

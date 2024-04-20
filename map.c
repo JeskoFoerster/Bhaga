@@ -30,8 +30,8 @@ struct KeyValuePair* create_key_value_pair(const char* key, const char* value) {
 }
 
 
-struct Map* map_create() {
-    struct Map* map = (struct Map*)malloc(sizeof(struct Map));
+Map* map_create() {
+    Map* map = (struct Map*)malloc(sizeof(struct Map));
     if (map == NULL) {
         printf("Memory allocation failed.\n");
         exit(1);
@@ -46,7 +46,7 @@ struct Map* map_create() {
 }
 
 
-void map_insert_element(struct Map* map, const char* key, const char* value) {
+void map_insert_element(Map* map, const char* key, const char* value) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
         printf("Key is a nullptr! Unable to create entry.\n");
@@ -71,10 +71,10 @@ void map_insert_element(struct Map* map, const char* key, const char* value) {
 }
 
 
-const char* map_get_element(struct Map* map, const char* key) {
+const char* map_get_element(Map* map, const char* key) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
-        printf("Key is a nullptr! Unable to create entry.\n");
+        printf("Key is a nullptr! Unable to get entry.\n");
         exit(1);
     }
 
@@ -95,10 +95,10 @@ const char* map_get_element(struct Map* map, const char* key) {
 }
 
 
-void map_delete_element(struct Map* map, const char* key) {
+void map_delete_element(Map* map, const char* key) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
-        printf("Key is a nullptr! Unable to create entry.\n");
+        printf("Key is a nullptr! Unable to delete entry.\n");
         exit(1);
     }
 
@@ -131,7 +131,7 @@ void map_delete_element(struct Map* map, const char* key) {
 }
 
 
-void map_destroy(struct Map* map) {
+void map_destroy(Map* map) {
     for (int i = 0; i < MAP_SIZE; i++) {
         struct KeyValuePair* current = map->table[i];
         bool chainEnd = current == NULL;
