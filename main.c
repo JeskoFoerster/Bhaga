@@ -4,7 +4,7 @@
 
 #include "main.h"
 
-char** splitByWhitespace(char longArray[1024], int* numSubarrays) {
+char** splitByChar(char longArray[1024], int* numSubarrays, const char* splittChar) {
     char** subarrays = (char**)malloc(1024 * sizeof(char*)); // Allocate memory for subarrays
     if (!subarrays) {
         fprintf(stderr, "Memory allocation failed\n");
@@ -16,7 +16,7 @@ char** splitByWhitespace(char longArray[1024], int* numSubarrays) {
     int count = 0; // Counter for subarrays
 
     // Tokenize the input string and store subarrays
-    while ((token = strtok_r(rest, ":", &rest))) {
+    while ((token = strtok_r(rest, splittChar, &rest))) {
         subarrays[count] = strdup(token);
         if (!subarrays[count]) {
             fprintf(stderr, "Memory allocation failed\n");
@@ -40,7 +40,8 @@ int main() {
 
     //split the command
     int numSubarrays;
-    char** subarrays = splitByWhitespace(command, &numSubarrays);
+    const char splitter =':';
+    char** subarrays = splitByChar(command, &numSubarrays, &splitter);
     const char* method = subarrays[0];
 
     //loop until "QUIT" is entered
@@ -62,10 +63,10 @@ int main() {
             map_delete_element(map, key);
             printf("Deleted: %s.\n",key);
 
-        }else if(strcmp(method,"HLP") == 0){
-            printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HLP\", \"QUIT\" \n</Help>\n");
+        }else if(strcmp(method,"HELP") == 0){
+            printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\" \n</Help>\n");
         }else{
-            printf("Command not found, please enter a valid command. Enter \"HLP\" to so see possible commands.");
+            printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
         }
 
         //get new command
@@ -73,7 +74,7 @@ int main() {
         scanf("%s",&command);
 
         //split the new command
-        subarrays = splitByWhitespace(command, &numSubarrays);
+        subarrays = splitByChar(command, &numSubarrays, &splitter);
         method = subarrays[0];
     }
 

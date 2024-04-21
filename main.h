@@ -5,6 +5,6 @@
 
 #ifndef BHAGA_MAIN_H
 #define BHAGA_MAIN_H
-char** splitByWhitespace(char longArray[1024], int* numSubarrays);
+char** splitByChar(char longArray[1024], int* numSubarrays, const char* splittChar);
 
 #endif //BHAGA_MAIN_H
