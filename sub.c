@@ -86,9 +86,9 @@ int create_key_value_socket(Map *map){
                 //print command and handel command
                 printf("Received complete input from client: %s\n", full_input);
 
-                //TODO: write return from handel_command back to client
                 write(cfd, full_input, input_length);
-                const char* result = handel_command(map, full_input);
+                char* result = handle_command(map, full_input);
+                strcat(result, "\r \n");
                 write(cfd, &result,sizeof(result));
                 input_length = 0;
             }
@@ -130,7 +130,7 @@ char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
     return subarrays;
 }
 
-char* handel_command(Map *map,const char *command) {
+char* handle_command(Map *map, const char *command) {
 
     //split the command
     int numSubarrays;
@@ -141,8 +141,7 @@ char* handel_command(Map *map,const char *command) {
 
     if(strcmp(method,"QUIT") == 0){
         printf("Quiting CLI.\n");
-        //printf("Not yet implemented.\n");
-        result = "Session quitted";
+        strcat(result, "Quiting CLI.\n");
         return result;
     }
     else if(strcmp(method,"PUT") == 0){
@@ -150,12 +149,9 @@ char* handel_command(Map *map,const char *command) {
         const char* value = subarrays[2];
         map_insert_element(map, key, value);
         printf("Inserted: %s and %s.\n",key,value);
-        //building result string
-        //char k[sizeof(key)];
-        //char v[sizeof(value)];
-        //strcpy(k, key);
-        //strcpy(v, value);
-        result = "Inserted: ";
+
+        //return value
+        strcat(result, "Inserted: ");
         strcat(result, key);
         strcat(result, " and ");
         strcat(result, value);
@@ -166,6 +162,14 @@ char* handel_command(Map *map,const char *command) {
         const char* key = subarrays[1];
         const char* value = map_get_element(map, key);
         printf("Got: %s. The Value is: %s\n",key,value);
+
+        //return value
+        strcat(result, "Got: ");
+        strcat(result, key);
+        strcat(result, ". The Value is: ");
+        strcat(result, value);
+        strcat(result, "\n");
+        return result;
     }
     else if(strcmp(method,"DEL") == 0)
     {
@@ -173,15 +177,28 @@ char* handel_command(Map *map,const char *command) {
         map_delete_element(map, key);
         printf("Deleted: %s.\n",key);
 
+        //return value
+        strcat(result, "Deleted: ");
+        strcat(result, key);
+        strcat(result, "\n");
+        return result;
+
     }
     else if(strcmp(method,"BEG") == 0){
         printf("Beginning for transaction.\n");
         printf("Yet to implement.\n");
 
+        //return value
+        strcat(result, "Deleted: Beginning for transaction.\n");
+        return result;
+
     }
     else if(strcmp(method,"END") == 0){
         printf("Ending for transaction.\n");
-        printf("Yet to implement.\n");
+
+        //return value
+        strcat(result, "Deleted: Ending the transaction.\n");
+        return result;
 
     }
     else if(strcmp(method,"HELP") == 0){

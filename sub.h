@@ -3,7 +3,7 @@
 //
 #include "map.h"
 
-char* handel_command(Map *map, const char* command);
+char* handle_command(Map *map, const char* command);
 int create_key_value_socket(Map *map);
 char** splitByWhiteSpace(const char *longArray, int* numSubarrays);
 
