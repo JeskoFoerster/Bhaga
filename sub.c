@@ -76,8 +76,15 @@ int create_key_value_socket(Map *map){
 
             // Überprüfen, ob das letzte Zeichen ein Enter ist
             if (in[bytes_read - 1] == '\n') {
+                // Remove trailing "\r\n" characters
+                if (input_length >= 2 && full_input[input_length - 2] == '\r' && full_input[input_length - 1] == '\n') {
+                    full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
+                    full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
+                    input_length -= 2; // Adjust input length
+                }
+
                 //print command and handel command
-                printf("Received complete input from client: %s", full_input);
+                printf("Received complete input from client: %s\n", full_input);
                 handel_command(map, full_input);
 
                 //TODO: write return from handel_command back to client
@@ -122,22 +129,7 @@ char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
     return subarrays;
 }
 
-char* clean_up_command(const char* command) {
-
-    char* cleaned_command = strdup(command); // Create a copy of the command string
-    char* end_position = strstr(cleaned_command, "\r\n"); // Find the end of proper command
-
-    if (end_position != NULL) {
-        *end_position = '\0'; // Null-terminate at the end of proper command
-    }
-
-    return cleaned_command;
-}
-
 int handel_command(Map *map,const char *command) {
-
-    //clean the command from extra bytes
-    command = clean_up_command(command);
 
     //split the command
     int numSubarrays;
