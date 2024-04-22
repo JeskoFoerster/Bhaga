@@ -3,6 +3,12 @@
 //
 #include "map.h"
 #include "sub.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <string.h>
 
 #ifndef BHAGA_MAIN_H
 #define BHAGA_MAIN_H

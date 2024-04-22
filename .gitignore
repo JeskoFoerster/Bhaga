@@ -3,4 +3,6 @@
 .idea
 /cmake-build-debuglokal/
 /cmake-build-dockerbhaga/
-/cmake-build-ubuntu_prakbs24
+/cmake-build-ubuntu_prakbs24/
+/cmake-build-ubuntu_prakbs24-1/
+cmake-build-ubuntu_prakbs24_tests/
