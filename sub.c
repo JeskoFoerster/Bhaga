@@ -85,10 +85,11 @@ int create_key_value_socket(Map *map){
 
                 //print command and handel command
                 printf("Received complete input from client: %s\n", full_input);
-                handel_command(map, full_input);
 
                 //TODO: write return from handel_command back to client
                 write(cfd, full_input, input_length);
+                const char* result = handel_command(map, full_input);
+                write(cfd, &result,sizeof(result));
                 input_length = 0;
             }
 
@@ -129,22 +130,37 @@ char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
     return subarrays;
 }
 
-int handel_command(Map *map,const char *command) {
+char* handel_command(Map *map,const char *command) {
 
     //split the command
     int numSubarrays;
     char** subarrays = splitByWhiteSpace(command, &numSubarrays);
     const char* method = subarrays[0];
 
+    char* result;
+
     if(strcmp(method,"QUIT") == 0){
         printf("Quiting CLI.\n");
-        printf("Not yet implemented.\n");
+        //printf("Not yet implemented.\n");
+        result = "Session quitted";
+        return result;
     }
     else if(strcmp(method,"PUT") == 0){
         const char* key = subarrays[1];
         const char* value = subarrays[2];
         map_insert_element(map, key, value);
         printf("Inserted: %s and %s.\n",key,value);
+        //building result string
+        //char k[sizeof(key)];
+        //char v[sizeof(value)];
+        //strcpy(k, key);
+        //strcpy(v, value);
+        result = "Inserted: ";
+        strcat(result, key);
+        strcat(result, " and ");
+        strcat(result, value);
+        strcat(result, "\n");
+        return result;
     }
     else if(strcmp(method,"GET") == 0){
         const char* key = subarrays[1];
