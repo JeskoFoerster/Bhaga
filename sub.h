@@ -9,7 +9,7 @@
 #ifndef BHAGA_MAIN_H
 #define BHAGA_MAIN_H
 int create_command_line_interface();
-int create_socket();
+int create_socket_nils();
 char** splitByChar(char longArray[1024], int* numSubarrays, const char* splittChar);
 
 #endif //BHAGA_MAIN_H
