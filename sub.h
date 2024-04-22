@@ -1,16 +1,9 @@
 //
 // Created by foersterje on 18.04.2024.
 //
-
-#ifndef BHAGA_SUB_H
-#define BHAGA_SUB_H
 #include "map.h"
 
-#ifndef BHAGA_MAIN_H
-#define BHAGA_MAIN_H
-int create_command_line_interface();
-int create_socket_nils();
-char** splitByChar(char longArray[1024], int* numSubarrays, const char* splittChar);
+int handel_command(Map *map, const char* command);
+int create_key_value_socket(Map *map);
+char** splitByWhiteSpace(const char *longArray, int* numSubarrays);
 
-#endif //BHAGA_MAIN_H
-#endif //BHAGA_SUB_H

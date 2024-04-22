@@ -14,101 +14,8 @@
 #define BUFFER_SIZE 1024
 #define ENDLOSSCHLEIFE 1
 
-char** splitByChar(char longArray[1024], int* numSubarrays, const char* splittChar) {
-    char** subarrays = (char**)malloc(1024 * sizeof(char*)); // Allocate memory for subarrays
-    if (!subarrays) {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(1);
-    }
 
-    char *token;
-    char *rest = longArray;
-    int count = 0; // Counter for subarrays
-
-    // Tokenize the input string and store subarrays
-    while ((token = strtok_r(rest, splittChar, &rest))) {
-        subarrays[count] = strdup(token);
-        if (!subarrays[count]) {
-            fprintf(stderr, "Memory allocation failed\n");
-            exit(1);
-        }
-        count++;
-    }
-
-    *numSubarrays = count; // Update numSubarrays with the count
-    return subarrays;
-}
-
-int create_command_line_interface() {
-    //set up map
-    Map *map = map_create();
-
-    //take first command
-    printf("Welcome to the server please enter a command!\n");
-    char command[1024];
-    scanf(" %[^\n]", command);
-
-    //split the command
-    int numSubarrays;
-    const char splitter =':';
-    char** subarrays = splitByChar(command, &numSubarrays, &splitter);
-    const char* method = subarrays[0];
-
-    //loop until "QUIT" is entered
-    while(strcmp(method,"QUIT") != 0){
-
-        if(strcmp(method,"PUT") == 0){
-            const char* key = subarrays[1];
-            const char* value = subarrays[2];
-            map_insert_element(map, key, value);
-            printf("Inserted: %s and %s.\n",key,value);
-        }
-        else if(strcmp(method,"GET") == 0){
-            const char* key = subarrays[1];
-            const char* value = map_get_element(map, key);
-            printf("Got: %s. The Value is: %s\n",key,value);
-        }
-        else if(strcmp(method,"DEL") == 0)
-        {
-            const char* key = subarrays[1];
-            map_delete_element(map, key);
-            printf("Deleted: %s.\n",key);
-
-        }
-        else if(strcmp(method,"BEG") == 0){
-            printf("Beginning for transaction.\n");
-            printf("Yet to implement.\n");
-
-        }
-        else if(strcmp(method,"END") == 0){
-            printf("Ending for transaction.\n");
-            printf("Yet to implement.\n");
-
-        }
-        else if(strcmp(method,"HELP") == 0){
-            printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
-        }
-        else{
-            printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
-        }
-
-        //get new command
-        printf("Please enter a new command. \n");
-        scanf("%s",&command);
-
-        //split the new command
-        subarrays = splitByChar(command, &numSubarrays, &splitter);
-        method = subarrays[0];
-    }
-
-    map_destroy(map);
-    //Show that the program has ended
-    printf("Main terminated, because \"QUIT\" was entered.\n");
-    return 0;
-}
-
-
-int create_socket_nils(){
+int create_key_value_socket(Map *map){
     int rfd; // Rendevouz-Descriptor
     int cfd; // Verbindungs-Descriptor
 
@@ -156,9 +63,6 @@ int create_socket_nils(){
         cfd = accept(rfd, (struct sockaddr *) &client, &client_len);
 
         write(cfd, "Moegliche Befehle: GET, DEL, PUT, QUIT\n\r", 40);
-        write(cfd, "Einabe: GET [key]\n\r", 19);
-        write(cfd, "Einabe: DEL [key]\n\r", 19);
-        write(cfd, "Einabe: PUT [key] [value]\n\r\n", 28);
 
         bytes_read = read(cfd, in, BUFFER_SIZE);
 
@@ -172,7 +76,11 @@ int create_socket_nils(){
 
             // Überprüfen, ob das letzte Zeichen ein Enter ist
             if (in[bytes_read - 1] == '\n') {
+                //print command and handel command
                 printf("Received complete input from client: %s", full_input);
+                handel_command(map, full_input);
+
+                //TODO: write return from handel_command back to client
                 write(cfd, full_input, input_length);
                 input_length = 0;
             }
@@ -181,4 +89,99 @@ int create_socket_nils(){
         }
         close(cfd);
     }
+}
+
+char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
+    char** subarrays = (char**)malloc(1024 * sizeof(char*)); // Allocate memory for subarrays
+    if (!subarrays) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
+    }
+
+    char *token;
+    char *rest = strdup(longArray); // Duplicate the input string to avoid modifying it
+    if (!rest) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
+    }
+
+    int count = 0; // Counter for subarrays
+
+    // Tokenize the input string and store subarrays
+    const char splitChar = ' '; // Split only by space character
+    while ((token = strtok_r(rest, &splitChar, &rest))) {
+        subarrays[count] = strdup(token);
+        if (!subarrays[count]) {
+            fprintf(stderr, "Memory allocation failed\n");
+            exit(1);
+        }
+        count++;
+    }
+
+    *numSubarrays = count; // Update numSubarrays with the count
+    return subarrays;
+}
+
+char* clean_up_command(const char* command) {
+
+    char* cleaned_command = strdup(command); // Create a copy of the command string
+    char* end_position = strstr(cleaned_command, "\r\n"); // Find the end of proper command
+
+    if (end_position != NULL) {
+        *end_position = '\0'; // Null-terminate at the end of proper command
+    }
+
+    return cleaned_command;
+}
+
+int handel_command(Map *map,const char *command) {
+
+    //clean the command from extra bytes
+    command = clean_up_command(command);
+
+    //split the command
+    int numSubarrays;
+    char** subarrays = splitByWhiteSpace(command, &numSubarrays);
+    const char* method = subarrays[0];
+
+    if(strcmp(method,"QUIT") == 0){
+        printf("Quiting CLI.\n");
+        printf("Not yet implemented.\n");
+    }
+    else if(strcmp(method,"PUT") == 0){
+        const char* key = subarrays[1];
+        const char* value = subarrays[2];
+        map_insert_element(map, key, value);
+        printf("Inserted: %s and %s.\n",key,value);
+    }
+    else if(strcmp(method,"GET") == 0){
+        const char* key = subarrays[1];
+        const char* value = map_get_element(map, key);
+        printf("Got: %s. The Value is: %s\n",key,value);
+    }
+    else if(strcmp(method,"DEL") == 0)
+    {
+        const char* key = subarrays[1];
+        map_delete_element(map, key);
+        printf("Deleted: %s.\n",key);
+
+    }
+    else if(strcmp(method,"BEG") == 0){
+        printf("Beginning for transaction.\n");
+        printf("Yet to implement.\n");
+
+    }
+    else if(strcmp(method,"END") == 0){
+        printf("Ending for transaction.\n");
+        printf("Yet to implement.\n");
+
+    }
+    else if(strcmp(method,"HELP") == 0){
+        printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
+    }
+    else{
+        printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
+    }
+
+    return 0;
 }
