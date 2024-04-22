@@ -62,20 +62,33 @@ int create_command_line_interface() {
             const char* value = subarrays[2];
             map_insert_element(map, key, value);
             printf("Inserted: %s and %s.\n",key,value);
-
-        }else if(strcmp(method,"GET") == 0){
+        }
+        else if(strcmp(method,"GET") == 0){
             const char* key = subarrays[1];
             const char* value = map_get_element(map, key);
             printf("Got: %s. The Value is: %s\n",key,value);
-
-        }else if(strcmp(method,"DEL") == 0){
+        }
+        else if(strcmp(method,"DEL") == 0)
+        {
             const char* key = subarrays[1];
             map_delete_element(map, key);
             printf("Deleted: %s.\n",key);
 
-        }else if(strcmp(method,"HELP") == 0){
-            printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\" \n</Help>\n");
-        }else{
+        }
+        else if(strcmp(method,"BEG") == 0){
+            printf("Beginning for transaction.\n");
+            printf("Yet to implement.\n");
+
+        }
+        else if(strcmp(method,"END") == 0){
+            printf("Ending for transaction.\n");
+            printf("Yet to implement.\n");
+
+        }
+        else if(strcmp(method,"HELP") == 0){
+            printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
+        }
+        else{
             printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
         }
 
