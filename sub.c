@@ -88,7 +88,7 @@ int create_key_value_socket(Map *map){
 
                 write(cfd, full_input, input_length);
                 char* result = handle_command(map, full_input);
-                strcat(result, "\r \n");
+                //strcat(result, "\r \n");
                 write(cfd, &result,sizeof(result));
                 input_length = 0;
             }
@@ -137,11 +137,14 @@ char* handle_command(Map *map, const char *command) {
     char** subarrays = splitByWhiteSpace(command, &numSubarrays);
     const char* method = subarrays[0];
 
-    char* result;
-
     if(strcmp(method,"QUIT") == 0){
         printf("Quiting CLI.\n");
-        strcat(result, "Quiting CLI.\n");
+
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Quitting Server\n");
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
     else if(strcmp(method,"PUT") == 0){
@@ -151,11 +154,10 @@ char* handle_command(Map *map, const char *command) {
         printf("Inserted: %s and %s.\n",key,value);
 
         //return value
-        strcat(result, "Inserted: ");
-        strcat(result, key);
-        strcat(result, " and ");
-        strcat(result, value);
-        strcat(result, "\n");
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Inserted %s with the value %s\n", key, value);
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
     else if(strcmp(method,"GET") == 0){
@@ -164,11 +166,10 @@ char* handle_command(Map *map, const char *command) {
         printf("Got: %s. The Value is: %s\n",key,value);
 
         //return value
-        strcat(result, "Got: ");
-        strcat(result, key);
-        strcat(result, ". The Value is: ");
-        strcat(result, value);
-        strcat(result, "\n");
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Got %s with it has the value %s\n", key, value);
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
     else if(strcmp(method,"DEL") == 0)
@@ -178,18 +179,21 @@ char* handle_command(Map *map, const char *command) {
         printf("Deleted: %s.\n",key);
 
         //return value
-        strcat(result, "Deleted: ");
-        strcat(result, key);
-        strcat(result, "\n");
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Deleted %s form the Map\n", key);
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
-
     }
     else if(strcmp(method,"BEG") == 0){
         printf("Beginning for transaction.\n");
         printf("Yet to implement.\n");
 
         //return value
-        strcat(result, "Deleted: Beginning for transaction.\n");
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Starting exclusive connection to Map\n");
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
 
     }
@@ -197,16 +201,31 @@ char* handle_command(Map *map, const char *command) {
         printf("Ending for transaction.\n");
 
         //return value
-        strcat(result, "Deleted: Ending the transaction.\n");
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Starting exclusive connection to Map\n");
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
 
     }
     else if(strcmp(method,"HELP") == 0){
         printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
+
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
+        return result;
     }
     else{
         printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
-    }
 
-    return 0;
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
+        return result;
+    }
 }
