@@ -8,94 +8,124 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <pthread.h>
+
 #include "main.h"
 
 #define PORT 5678
+#define MAX_CLIENTS 5
 #define BUFFER_SIZE 1024
-#define ENDLOSSCHLEIFE 1
 
+typedef struct {
+    int client_socket;
+    Map *map;
+} ClientData;
 
-int create_key_value_socket(Map *map){
-    int rfd; // Rendevouz-Descriptor
-    int cfd; // Verbindungs-Descriptor
+void *client_handler(void *arg) {
+    ClientData *data = (ClientData *)arg;
+    int client_socket = data->client_socket;
+    Map *map = data->map;
+    char in[BUFFER_SIZE];
+    int bytes_read;
+    char full_input[BUFFER_SIZE];
+    int input_length = 0;
 
-    struct sockaddr_in client; // Socketadresse eines Clients
-    socklen_t client_len; // Länge der Client-Daten
-    char in[BUFFER_SIZE]; // Daten vom Client an den Server
-    int bytes_read; // Anzahl der Bytes, die der Client geschickt hat
+    // Send initial message to client
+    write(client_socket, "Moegliche Befehle: GET, DEL, PUT, QUIT\n\r", 40);
 
+    // Receive data from client and process it
+    while ((bytes_read = read(client_socket, in, BUFFER_SIZE)) > 0) {
+        // Add received data to full_input
+        strncpy(full_input + input_length, in, bytes_read);
+        input_length += bytes_read;
 
-    // Socket erstellen
-    rfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (rfd < 0 ){
-        fprintf(stderr, "socket konnte nicht erstellt werden\n");
-        exit(-1);
-    }
-
-
-    // Socket Optionen setzen für schnelles wiederholtes Binden der Adresse
-    int option = 1;
-    setsockopt(rfd, SOL_SOCKET, SO_REUSEADDR, (const void *) &option, sizeof(int));
-
-
-    // Socket binden
-    struct sockaddr_in server;
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(PORT);
-    int brt = bind(rfd, (struct sockaddr *) &server, sizeof(server));
-    if (brt < 0 ){
-        fprintf(stderr, "socket konnte nicht gebunden werden\n");
-        exit(-1);
-    }
-
-
-    // Socket lauschen lassen
-    int lrt = listen(rfd, 5);
-    if (lrt < 0 ){
-        fprintf(stderr, "socket konnte nicht listen gesetzt werden\n");
-        exit(-1);
-    }
-
-    printf("Created Socket\nWaiting for input...\n");
-
-    while (ENDLOSSCHLEIFE) {
-        cfd = accept(rfd, (struct sockaddr *) &client, &client_len);
-
-        write(cfd, "Moegliche Befehle: GET, DEL, PUT, QUIT\n\r", 40);
-
-        bytes_read = read(cfd, in, BUFFER_SIZE);
-
-        char full_input[BUFFER_SIZE];
-        int input_length = 0;
-
-        while (bytes_read > 0) {
-            // Daten dem full_input hinzufügen
-            strncpy(full_input + input_length, in, bytes_read);
-            input_length += bytes_read;
-
-            // Überprüfen, ob das letzte Zeichen ein Enter ist
-            if (in[bytes_read - 1] == '\n') {
-                // Remove trailing "\r\n" characters
-                if (input_length >= 2 && full_input[input_length - 2] == '\r' && full_input[input_length - 1] == '\n') {
-                    full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
-                    full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
-                    input_length -= 2; // Adjust input length
-                }
-
-                //print command and handel command
-                printf("Received complete input from client: %s\n", full_input);
-
-                write(cfd, full_input, input_length);
-                char* result = handle_command(map, full_input);
-                //strcat(result, "\r \n");
-                write(cfd, result,sizeof(result));
-                input_length = 0;
+        // Check if the last character is a newline
+        if (in[bytes_read - 1] == '\n') {
+            // Remove trailing "\r\n" characters
+            if (input_length >= 2 && full_input[input_length - 2] == '\r' && full_input[input_length - 1] == '\n') {
+                full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
+                full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
+                input_length -= 2; // Adjust input length
             }
 
-            bytes_read = read(cfd, in, BUFFER_SIZE);
+            // Print received command and handle it
+            printf("Received complete input from client: %s\n", full_input);
+
+            write(client_socket, full_input, input_length);
+            char *result = handle_command(map, full_input);
+            write(client_socket, result, strlen(result)); // Send result to client
+            input_length = 0; // Reset input_length for next command
         }
-        close(cfd);
+    }
+
+    // Close client socket
+    close(client_socket);
+    free(data); // Free dynamically allocated data
+    pthread_exit(NULL);
+}
+
+int create_key_value_socket(Map *map){
+    int server_socket, client_socket;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    pthread_t tid;
+    ClientData *client_data;
+
+    // Create server socket
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket == -1) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize server address struct
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+
+    // Bind socket to port
+    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Listen for incoming connections
+    if (listen(server_socket, MAX_CLIENTS) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server listening on port %d...\n", PORT);
+
+    // Accept incoming connections and handle them
+    while (1) {
+        // Accept a client connection
+        client_socket = accept(server_socket, (struct sockaddr *) &client_addr, &client_len);
+        if (client_socket < 0) {
+            perror("Accept failed");
+            continue; // Continue to wait for next connection
+        }
+
+        printf("New client connected\n");
+
+        // Create data structure to pass to thread
+        client_data = (ClientData *) malloc(sizeof(ClientData));
+        if (client_data == NULL) {
+            perror("Memory allocation failed");
+            close(client_socket);
+            continue; // Continue to wait for next connection
+        }
+        client_data->client_socket = client_socket;
+        client_data->map = map;
+
+        // Create thread to handle client
+        if (pthread_create(&tid, NULL, client_handler, (void *) client_data) != 0) {
+            perror("Thread creation failed");
+            close(client_socket);
+            free(client_data);
+            continue; // Continue to wait for next connection
+        }
     }
 }
 
