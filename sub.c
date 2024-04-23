@@ -53,6 +53,12 @@ void *client_handler(void *arg) {
 
             //write(client_socket, full_input, input_length);
             char *result = handle_command(map, full_input);
+            //destroy socket if demanded
+            if (strcmp(result,"QUIT") == 0) {
+                write(client_socket, "Connection closed!", 18);
+                close(client_socket);
+            }
+
             write(client_socket, result, strlen(result)); // Send result to client
             input_length = 0; // Reset input_length for next command
         }
@@ -175,7 +181,7 @@ char* handle_command(Map *map, const char *command) {
         sprintf(buffer, "Quitting Server\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
-        return result;
+        return "QUIT";
     }
     else if(strcmp(method,"PUT") == 0){
         const char* key = subarrays[1];
