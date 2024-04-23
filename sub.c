@@ -89,7 +89,7 @@ int create_key_value_socket(Map *map){
                 write(cfd, full_input, input_length);
                 char* result = handle_command(map, full_input);
                 //strcat(result, "\r \n");
-                write(cfd, &result,sizeof(result));
+                write(cfd, result,sizeof(result));
                 input_length = 0;
             }
 
@@ -219,6 +219,7 @@ char* handle_command(Map *map, const char *command) {
         return result;
     }
     else{
+        //stuck?
         printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
 
         //return value
