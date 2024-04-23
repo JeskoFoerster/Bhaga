@@ -11,8 +11,18 @@ int main()
     pid_t p = fork();
     if(p<0){
         perror("fork fail");
+    }else if(p > 0){
+
+        printf("Hello Main!, process_id(pid) = %d \n",getpid());
+        //declare global because this will be shared mem in the future.
+        Map *map = map_create();
+        create_key_value_socket(map);
+
     }
-    printf("Hello world!, process_id(pid) = %d \n",getpid());
+    else{
+        printf("Hello Child!, process_id(pid) = %d \n",getpid());
+    }
+
     //declare global because this will be shared mem in the future.
     Map *map = map_create();
     create_key_value_socket(map);
