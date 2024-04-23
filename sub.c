@@ -51,7 +51,7 @@ void *client_handler(void *arg) {
             // Print received command and handle it
             printf("Received complete input from client: %s\n", full_input);
 
-            write(client_socket, full_input, input_length);
+            //write(client_socket, full_input, input_length);
             char *result = handle_command(map, full_input);
             write(client_socket, result, strlen(result)); // Send result to client
             input_length = 0; // Reset input_length for next command
@@ -168,11 +168,11 @@ char* handle_command(Map *map, const char *command) {
     const char* method = subarrays[0];
 
     if(strcmp(method,"QUIT") == 0){
-        printf("Quiting CLI.\n");
+        printf("Quiting CLI.\n\r");
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Quitting Server\n");
+        sprintf(buffer, "Quitting Server\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
@@ -181,11 +181,11 @@ char* handle_command(Map *map, const char *command) {
         const char* key = subarrays[1];
         const char* value = subarrays[2];
         map_insert_element(map, key, value);
-        printf("Inserted: %s and %s.\n",key,value);
+        printf("Inserted: %s and %s.\n\r",key,value);
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Inserted %s with the value %s\n", key, value);
+        sprintf(buffer, "Inserted %s with the value %s\n\r", key, value);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
@@ -193,11 +193,11 @@ char* handle_command(Map *map, const char *command) {
     else if(strcmp(method,"GET") == 0){
         const char* key = subarrays[1];
         const char* value = map_get_element(map, key);
-        printf("Got: %s. The Value is: %s\n",key,value);
+        printf("Got: %s. The Value is: %s\n\r",key,value);
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Got %s with it has the value %s\n", key, value);
+        sprintf(buffer, "Got %s with it has the value %s\n\r", key, value);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
@@ -206,55 +206,55 @@ char* handle_command(Map *map, const char *command) {
     {
         const char* key = subarrays[1];
         map_delete_element(map, key);
-        printf("Deleted: %s.\n",key);
+        printf("Deleted: %s.\n\r",key);
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Deleted %s form the Map\n", key);
+        sprintf(buffer, "Deleted %s form the Map\n\r", key);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
     else if(strcmp(method,"BEG") == 0){
-        printf("Beginning for transaction.\n");
-        printf("Yet to implement.\n");
+        printf("Beginning for transaction.\n\r");
+        printf("Yet to implement.\n\r");
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Starting exclusive connection to Map\n");
+        sprintf(buffer, "Starting exclusive connection to Map\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
 
     }
     else if(strcmp(method,"END") == 0){
-        printf("Ending for transaction.\n");
+        printf("Ending for transaction.\n\r");
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Starting exclusive connection to Map\n");
+        sprintf(buffer, "Starting exclusive connection to Map\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
 
     }
     else if(strcmp(method,"HELP") == 0){
-        printf("<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
+        printf("<Help>\n\rPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n\r</Help>\n\r");
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "<Help>\nPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n</Help>\n");
+        sprintf(buffer, "<Help>\n\rPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n\r</Help>\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
     else{
         //stuck?
-        printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
+        printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.\n\r");
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.");
+        sprintf(buffer, "Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
