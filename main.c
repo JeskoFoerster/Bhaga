@@ -22,8 +22,4 @@ int main()
     else{
         printf("Hello Child!, process_id(pid) = %d \n",getpid());
     }
-
-    //declare global because this will be shared mem in the future.
-    Map *map = map_create();
-    create_key_value_socket(map);
 }
