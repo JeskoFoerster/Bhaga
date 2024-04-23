@@ -3,11 +3,15 @@ project(Bhaga C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Bhaga main.c
+add_executable(
+        Bhaga main.c
         main.h
         keyValStore.c
         keyValStore.h
         sub.c
         sub.h
         map.c
-        map.h)
+        map.h
+)
+
+target_link_libraries(Bhaga pthread)
