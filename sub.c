@@ -9,6 +9,10 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/wait.h>
 
 #include "main.h"
 
@@ -53,6 +57,27 @@ int create_key_value_socket(Map *map){
         exit(EXIT_FAILURE);
     }
 
+    //Shared Memory:
+    int shmid;
+    Map *shar_mem;
+
+    // Erstellen des Shared Memory
+    shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);
+    if (shmid == -1) {
+        perror("shmget failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Anhängen des Shared Memory an den Prozess
+    shar_mem = (Map *)shmat(shmid, 0, 0);
+    if (shar_mem == (void *)-1) {
+        perror("shmat failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Kopieren der Map-Daten in den Shared Memory
+    memcpy(shar_mem, map, sizeof(*map));
+
     printf("Server listening on port %d...\n", PORT);
 
     // Accept incoming connections and handle them
@@ -79,7 +104,7 @@ int create_key_value_socket(Map *map){
             close(server_socket); // Close server socket in child process
 
             // Handle client in child process
-            handle_client(client_socket, map);
+            handle_client(client_socket, shar_mem);
 
             // Close client socket and exit child process
             close(client_socket);
