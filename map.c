@@ -50,7 +50,6 @@ void map_insert_element(Map* map, const char* key, const char* value) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
         printf("Key is a nullptr! Unable to create entry.\n");
-        exit(1);
     }
 
     unsigned int index = hash(key);
@@ -84,7 +83,7 @@ const char* map_get_element(Map* map, const char* key) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
         printf("Key is a nullptr! Unable to get entry.\n");
-        exit(1);
+        return NULL;
     }
 
     unsigned int index = hash(key);
@@ -108,7 +107,6 @@ void map_delete_element(Map* map, const char* key) {
     //catch nullptr here because in the map NULL means not set
     if(key == NULL){
         printf("Key is a nullptr! Unable to delete entry.\n");
-        exit(1);
     }
 
     unsigned int index = hash(key);
