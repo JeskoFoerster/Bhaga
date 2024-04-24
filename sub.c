@@ -21,55 +21,6 @@ typedef struct {
     Map *map;
 } ClientData;
 
-void *client_handler(void *arg) {
-    ClientData *data = (ClientData *)arg;
-    int client_socket = data->client_socket;
-    Map *map = data->map;
-    char in[BUFFER_SIZE];
-    int bytes_read;
-    char full_input[BUFFER_SIZE];
-    int input_length = 0;
-
-    // Send initial message to client
-    write(client_socket, "Moegliche Befehle: GET, DEL, PUT, QUIT\n\r", 40);
-
-    // Receive data from client and process it
-    while ((bytes_read = read(client_socket, in, BUFFER_SIZE)) > 0) {
-        // Add received data to full_input
-        strncpy(full_input + input_length, in, bytes_read);
-        input_length += bytes_read;
-
-        // Check if the last character is a newline
-        if (in[bytes_read - 1] == '\n') {
-            // Remove trailing "\r\n" characters
-            if (input_length >= 2 && full_input[input_length - 2] == '\r' && full_input[input_length - 1] == '\n') {
-                full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
-                full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
-                input_length -= 2; // Adjust input length
-            }
-
-            // Print received command and handle it
-            printf("Received complete input from client: %s\n", full_input);
-
-            //write(client_socket, full_input, input_length);
-            char *result = handle_command(map, full_input);
-            //destroy socket if demanded
-            if (strcmp(result,"QUIT") == 0) {
-                write(client_socket, "Connection closed!", 18);
-                close(client_socket);
-            }
-
-            write(client_socket, result, strlen(result)); // Send result to client
-            input_length = 0; // Reset input_length for next command
-        }
-    }
-
-    // Close client socket
-    close(client_socket);
-    free(data); // Free dynamically allocated data
-    pthread_exit(NULL);
-}
-
 int create_key_value_socket(Map *map){
     int server_socket, client_socket;
     struct sockaddr_in server_addr, client_addr;
@@ -178,7 +129,6 @@ void handle_client(int client_socket, Map *map) {
     // Close client socket
     close(client_socket);
 }
-
 
 char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
     char** subarrays = (char**)malloc(1024 * sizeof(char*)); // Allocate memory for subarrays
