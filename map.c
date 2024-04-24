@@ -57,11 +57,20 @@ void map_insert_element(Map* map, const char* key, const char* value) {
     struct KeyValuePair* pair = create_key_value_pair(key, value);
 
     // Handle collision by chaining
-    bool collision = map->table[index] != NULL;
+    bool collision = true;
+    if(map->table[index] == NULL){
+        collision = false;
+
+    }else{
+        //this is not null check if it is the same key
+        if(map->table[index]->key != key ){
+            collision = false;
+        }
+    }
     if (collision) {
         // Collision detected, add to the end of the chain
         struct KeyValuePair* current = map->table[index];
-        while (current->nextPair != NULL) {
+        while (map->table[index] != NULL || map->table[index]->key != key) {
             current = current->nextPair;
         }
         current->nextPair = pair;
