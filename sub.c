@@ -120,6 +120,11 @@ void handle_client(int client_socket, Map *map) {
 
             // Write response to client
             char *result = handle_command(map, full_input);
+            //destroy socket if demanded
+            if (strcmp(result,"QUIT") == 0) {
+                write(client_socket, "Connection closed!", 18);
+                close(client_socket);
+            }
             write(client_socket, result, strlen(result)); // Send result to client
             free(result); // Free dynamically allocated result
             input_length = 0; // Reset input_length for next command
@@ -170,13 +175,9 @@ char* handle_command(Map *map, const char *command) {
 
     if(strcmp(method,"QUIT") == 0){
         printf("Quiting CLI.\n\r");
-
         //return value
-        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Quitting Server\n\r");
-        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
-        strcpy(result, buffer); // Copy the formatted string into the allocated memory
-        return "QUIT";
+        char* result = "QUIT";
+        return result;
     }
     else if(strcmp(method,"PUT") == 0){
         const char* key = subarrays[1];
