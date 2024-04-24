@@ -109,25 +109,70 @@ int create_key_value_socket(Map *map){
 
         printf("New client connected\n");
 
-        // Create data structure to pass to thread
-        client_data = (ClientData *) malloc(sizeof(ClientData));
-        if (client_data == NULL) {
-            perror("Memory allocation failed");
+        // Fork a new process
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("Fork failed");
             close(client_socket);
             continue; // Continue to wait for next connection
         }
-        client_data->client_socket = client_socket;
-        client_data->map = map;
 
-        // Create thread to handle client
-        if (pthread_create(&tid, NULL, client_handler, (void *) client_data) != 0) {
-            perror("Thread creation failed");
+        if (pid == 0) {
+            // Child process
+            close(server_socket); // Close server socket in child process
+
+            // Handle client in child process
+            handle_client(client_socket, map);
+
+            // Close client socket and exit child process
             close(client_socket);
-            free(client_data);
-            continue; // Continue to wait for next connection
+            exit(EXIT_SUCCESS);
+        } else {
+            // Parent process
+            close(client_socket); // Close client socket in parent process
         }
     }
 }
+
+void handle_client(int client_socket, Map *map) {
+    char in[BUFFER_SIZE];
+    int bytes_read;
+    char full_input[BUFFER_SIZE];
+    int input_length = 0;
+
+    // Send initial message to client
+    write(client_socket, "Moegliche Befehle: GET, DEL, PUT, QUIT\n\r", 40);
+
+    // Receive data from client and process it
+    while ((bytes_read = read(client_socket, in, BUFFER_SIZE)) > 0) {
+        // Add received data to full_input
+        strncpy(full_input + input_length, in, bytes_read);
+        input_length += bytes_read;
+
+        // Check if the last character is a newline
+        if (in[bytes_read - 1] == '\n') {
+            // Remove trailing "\r\n" characters
+            if (input_length >= 2 && full_input[input_length - 2] == '\r' && full_input[input_length - 1] == '\n') {
+                full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
+                full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
+                input_length -= 2; // Adjust input length
+            }
+
+            // Print received command and handle it
+            printf("Received complete input from client: %s\n", full_input);
+
+            // Write response to client
+            char *result = handle_command(map, full_input);
+            write(client_socket, result, strlen(result)); // Send result to client
+            free(result); // Free dynamically allocated result
+            input_length = 0; // Reset input_length for next command
+        }
+    }
+
+    // Close client socket
+    close(client_socket);
+}
+
 
 char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
     char** subarrays = (char**)malloc(1024 * sizeof(char*)); // Allocate memory for subarrays
