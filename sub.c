@@ -160,36 +160,55 @@ void handle_client(int client_socket, Map *map) {
     close(client_socket);
 }
 
-char** splitByWhiteSpace(const char *longArray, int* numSubarrays) {
-    char** subarrays = (char**)malloc(1024 * sizeof(char*)); // Allocate memory for subarrays
-    if (!subarrays) {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(1);
-    }
-
-    char *token;
-    char *rest = strdup(longArray); // Duplicate the input string to avoid modifying it
-    if (!rest) {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(1);
-    }
-
-    int count = 0; // Counter for subarrays
-
-    // Tokenize the input string and store subarrays
-    const char splitChar = ' '; // Split only by space character
-    while ((token = strtok_r(rest, &splitChar, &rest))) {
-        subarrays[count] = strdup(token);
-        if (!subarrays[count]) {
-            fprintf(stderr, "Memory allocation failed\n");
-            exit(1);
+char** splitByWhiteSpace(const char* command, int* numSubarrays) {
+    // Count the number of whitespaces to determine the size of the result array
+    int count = 0;
+    const char* ptr = command;
+    while (*ptr) {
+        // Skip leading whitespaces
+        while (*ptr && *ptr == ' ') ptr++;
+        if (*ptr) {
+            count++;
+            // Skip the current word
+            while (*ptr && *ptr != ' ') ptr++;
         }
-        count++;
     }
 
-    *numSubarrays = count; // Update numSubarrays with the count
-    return subarrays;
+    // Allocate memory for the result array
+    char** result = (char**)malloc(count * sizeof(char*));
+    if (!result) {
+        fprintf(stderr, "Error: Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Split the command at whitespaces and store the parts in the result array
+    int index = 0;
+    ptr = command;
+    while (*ptr) {
+        // Skip leading whitespaces
+        while (*ptr && *ptr == ' ') ptr++;
+        if (*ptr) {
+            const char* start = ptr;
+            // Move to the end of the current word
+            while (*ptr && *ptr != ' ') ptr++;
+            const char* end = ptr;
+            int length = end - start;
+            // Allocate memory for the current part and copy it
+            result[index] = (char*)malloc((length + 1) * sizeof(char)); // +1 for the null terminator
+            if (!result[index]) {
+                fprintf(stderr, "Error: Memory allocation failed.\n");
+                exit(EXIT_FAILURE);
+            }
+            strncpy(result[index], start, length);
+            result[index][length] = '\0'; // Add null terminator
+            index++;
+        }
+    }
+
+    *numSubarrays = count;
+    return result;
 }
+
 
 char* handle_command(Map *map, const char *command) {
 
