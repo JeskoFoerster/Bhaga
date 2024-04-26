@@ -173,7 +173,7 @@ char* handle_command(Map *map, const char *command) {
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Starting exclusive connection to Map\n\r");
+        sprintf(buffer, "Ending exclusive connection to Map\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
