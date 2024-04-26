@@ -15,7 +15,6 @@
 
 
 int main() {
-    Map *map = map_create();
     int server_socket, client_socket;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
@@ -45,26 +44,19 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    //Shared Memory:
-    int shmid;
-    Map *shar_mem;
-
     // Erstellen des Shared Memory
-    shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);
+    int shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);
     if (shmid == -1) {
         perror("shmget failed");
         exit(EXIT_FAILURE);
     }
 
     // Anhängen des Shared Memory an den Prozess
-    shar_mem = (Map *)shmat(shmid, 0, 0);
-    if (shar_mem == (void *)-1) {
+    Map * shar_mem_map = (Map *)shmat(shmid, 0, 0);
+    if (shar_mem_map == (void *)-1) {
         perror("shmat failed");
         exit(EXIT_FAILURE);
     }
-
-    // Kopieren der Map-Daten in den Shared Memory
-    memcpy(shar_mem, map, sizeof(*map));
 
     printf("Server listening on port %d...\n", PORT);
 
@@ -92,7 +84,7 @@ int main() {
             close(server_socket); // Close server socket in child process
 
             // Handle client in child process
-            handle_client(client_socket, shar_mem);
+            handle_client(client_socket, shar_mem_map);
 
             // Close client socket and exit child process
             close(client_socket);
