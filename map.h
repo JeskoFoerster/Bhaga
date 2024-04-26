@@ -6,31 +6,23 @@
 #ifndef MAP_H
 #define MAP_H
 #define MAP_SIZE 100
+#define KEY_SIZE 128
+#define VALUE_SIZE 128
 
 struct KeyValuePair {
-    const char* key;
-    const char* value;
-    struct KeyValuePair* nextPair;
+    char key[KEY_SIZE];
+    char value[VALUE_SIZE];
 };
 
-
-struct Map {
-    struct KeyValuePair* table[MAP_SIZE];
-};
+typedef struct {
+    struct KeyValuePair table[MAP_SIZE];
+} Map;
 
 /**
  * @param key The key to hash.
  * @return The hash value (index).
  */
 unsigned int hash(const char* key);
-
-struct KeyValuePair* create_key_value_pair(const char* key, const char* value);
-
-typedef struct _Map {
-    struct KeyValuePair* table[MAP_SIZE];
-} Map;
-
-Map* map_create();
 
 void map_insert_element(Map* map, const char* key, const char* value);
 
@@ -40,7 +32,5 @@ void map_insert_element(Map* map, const char* key, const char* value);
 const char* map_get_element(Map* map, const char* key);
 
 void map_delete_element(Map* map, const char* key);
-
-void map_destroy(Map* map);
 
 #endif

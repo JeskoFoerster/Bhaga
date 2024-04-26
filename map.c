@@ -7,148 +7,58 @@
 #include <stdlib.h>
 #include <string.h>
 
-unsigned int hash(const char* key) {
-    unsigned int hash = 0;
-    for (int i = 0; key[i] != '\0'; i++) {
-        //link: https://www.geeksforgeeks.org/why-does-javas-hashcode-in-string-use-31-as-a-multiplier/
-        hash = 31 * hash + key[i];
-    }
-    return hash % MAP_SIZE;
-}
-
-
-struct KeyValuePair* create_key_value_pair(const char* key, const char* value) {
-    struct KeyValuePair* pair = (struct KeyValuePair*)malloc(sizeof(struct KeyValuePair));
-    if (pair == NULL) {
-        printf("Memory allocation failed.\n");
-        exit(1);
-    }
-    pair->key = strdup(key);
-    pair->value = strdup(value); // Duplicate the value string
-    pair->nextPair = NULL;
-    return pair;
-}
-
-
-Map* map_create() {
-    Map* map = (struct Map*)malloc(sizeof(struct Map));
-    if (map == NULL) {
-        printf("Memory allocation failed.\n");
-        exit(1);
-    }
-
-    // Initialize all table entries to NULL
-    for (int i = 0; i < MAP_SIZE; i++) {
-        map->table[i] = NULL;
-    }
-
-    return map;
-}
-
-
 void map_insert_element(Map* map, const char* key, const char* value) {
-    //catch nullptr here because in the map NULL means not set
-    if(key == NULL){
-        printf("Key is a nullptr! Unable to create entry.\n");
-    }
-
-    unsigned int index = hash(key);
-    struct KeyValuePair* pair = create_key_value_pair(key, value);
-
-    // Handle collision by chaining
-    bool collision = true;
-    if(map->table[index] == NULL){
-        collision = false;
-
-    }else{
-        //this is not null check if it is the same key
-        if(map->table[index]->key != key ){
-            collision = false;
+    // Check if the key already exists and update the value if found
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (strcmp(map->table[i].key, key) == 0) {
+            // Key already exists, update the value
+            int valueSize = sizeof(map->table[i].value) - 1;
+            strncpy(map->table[i].value, value, valueSize);
+            map->table[i].value[valueSize] = '\0';
+            return;
         }
     }
-    if (collision) {
-        // Collision detected, add to the end of the chain
-        struct KeyValuePair* current = map->table[index];
-        while (map->table[index] != NULL || map->table[index]->key != key) {
-            current = current->nextPair;
+
+    // Key not found, search for an empty slot
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (map->table[i].key[0] == '\0') {
+            // Found an empty slot, insert the new entry
+            int valueSize = sizeof(map->table[i].value) - 1;
+            int keySize = sizeof(map->table[i].key) - 1;
+
+            strncpy(map->table[i].key, key, keySize);
+            map->table[i].key[keySize] = '\0';
+
+            strncpy(map->table[i].value, value, valueSize);
+            map->table[i].value[valueSize] = '\0';
+            return;
         }
-        current->nextPair = pair;
-    } else {
-        map->table[index] = pair;
     }
+
+    // Array is fully occupied
+    printf("The storage is full, no further values can be saved.\n");
 }
-
 
 const char* map_get_element(Map* map, const char* key) {
-    //catch nullptr here because in the map NULL means not set
-    if(key == NULL){
-        printf("Key is a nullptr! Unable to get entry.\n");
-        return NULL;
-    }
-
-    unsigned int index = hash(key);
-    struct KeyValuePair* current = map->table[index];
-
-    // Search through the chain for the key
-    while (current != NULL) {
-        //compares the key of the map with the key in the list
-        if (strcmp(current->key, key) == 0) {
-            return current->value;
+    // Check if the key exists
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (strcmp(map->table[i].key, key) == 0) {
+            // Key found, return the value
+            return map->table[i].value;
         }
-        current = current->nextPair;
     }
-
     // Key not found
     return NULL;
 }
 
-
 void map_delete_element(Map* map, const char* key) {
-    //catch nullptr here because in the map NULL means not set
-    if(key == NULL){
-        printf("Key is a nullptr! Unable to delete entry.\n");
-    }
-
-    unsigned int index = hash(key);
-    struct KeyValuePair* current = map->table[index];
-    struct KeyValuePair* previous = NULL;
-
-    // Search through the chain for the key
-    while (current != NULL) {
-        //compares the key of the map with the key in the list
-        if (strcmp(current->key, key) == 0) {
-            // Key found, remove the pair from the chain
-            if (previous == NULL) {
-                // If the key-value pair is the head of the chain
-                map->table[index] = current->nextPair;
-            } else {
-                // If the key-value pair is not the head of the chain
-                previous->nextPair = current->nextPair;
-            }
-            // Free memory allocated for the key and the pair itself
-            free(current->key);
-            free(current->value);
-            free(current);
+    // Check if the key exists
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (strcmp(map->table[i].key, key) == 0) {
+            // Key found, delete the entry
+            map->table[i].key[0] = '\0';
+            map->table[i].value[0] = '\0';
             return;
         }
-        // Move to the nextPair pair in the chain
-        previous = current;
-        current = current->nextPair;
     }
-}
-
-
-void map_destroy(Map* map) {
-    for (int i = 0; i < MAP_SIZE; i++) {
-        struct KeyValuePair* current = map->table[i];
-        bool chainEnd = current == NULL;
-        while (!chainEnd) {
-            struct KeyValuePair* temp = current;
-            current = current->nextPair;
-            free(temp->key);
-            free(temp->value);
-            free(temp);
-        }
-    }
-    free(map);
 }
