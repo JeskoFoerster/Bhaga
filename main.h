@@ -12,11 +12,3 @@
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-
-#define PORT 5678
-#define MAX_CLIENTS 5
-
-typedef struct {
-    int client_socket;
-    Map *map;
-} ClientData;

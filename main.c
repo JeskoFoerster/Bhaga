@@ -13,19 +13,12 @@
 #define PORT 5678
 #define MAX_CLIENTS 5
 
-typedef struct {
-    int client_socket;
-    Map *map;
-} ClientData;
-
 
 int main() {
     Map *map = map_create();
     int server_socket, client_socket;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
-    pthread_t tid;
-    ClientData *client_data;
 
     // Create server socket
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
