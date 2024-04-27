@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/shm.h>
+#include <ctype.h>
 
 char* handle_command(Map *map, const char* command);
 char** splitByWhiteSpace(const char *longArray, int* numSubarrays);

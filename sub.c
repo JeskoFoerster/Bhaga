@@ -51,9 +51,12 @@ void handle_client(int client_socket, Map *map) {
 }
 
 char** splitByWhiteSpace(const char* command, int* numSubarrays) {
-    // Count the number of whitespaces to determine the size of the result array
-    int count = 0;
+    // Find the index of the first uppercase letter
     const char* ptr = command;
+    while (*ptr && !isupper(*ptr)) ptr++;
+
+    // Count the number of whitespaces starting from the first uppercase letter
+    int count = 0;
     while (*ptr) {
         // Skip leading whitespaces
         while (*ptr && *ptr == ' ') ptr++;
@@ -71,9 +74,10 @@ char** splitByWhiteSpace(const char* command, int* numSubarrays) {
         exit(EXIT_FAILURE);
     }
 
-    // Split the command at whitespaces and store the parts in the result array
+    // Split the command at whitespaces starting from the first uppercase letter
     int index = 0;
     ptr = command;
+    while (*ptr && !isupper(*ptr)) ptr++;
     while (*ptr) {
         // Skip leading whitespaces
         while (*ptr && *ptr == ' ') ptr++;
