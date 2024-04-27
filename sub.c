@@ -73,6 +73,15 @@ char** splitByWhiteSpace(const char* command, int* numSubarrays) {
     const char* ptr = command;
     while (*ptr && !isupper(*ptr)) ptr++;
 
+    // If no uppercase letter is found in the entire command
+    if (*ptr == '\0') {
+        *numSubarrays = 1;
+        char** result = (char**)malloc(sizeof(char*));
+        result[0] = (char*)malloc(strlen("notFound") + 1);
+        strcpy(result[0], "notFound");
+        return result;
+    }
+
     // Count the number of whitespaces starting from the first uppercase letter
     int count = 0;
     while (*ptr) {
