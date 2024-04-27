@@ -3,6 +3,7 @@
 //
 #include "map.h"
 #include "sub.h"
+#include "semaphore.h"
 
 #include <stdio.h>
 #include <stdlib.h>

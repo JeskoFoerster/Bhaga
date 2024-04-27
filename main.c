@@ -6,6 +6,7 @@
 
 int main() {
     int server_socket, client_socket;
+    int sem_group_id;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 
@@ -35,6 +36,15 @@ int main() {
     }
 
     Map * shar_mem_map = createSharedMemoryMap();
+
+    sem_group_id = semaphoreCreateGroup(1);
+    if (sem_group_id == -1) {
+        perror ("Die Gruppe konnte nicht angelegt werden!");
+        exit(1);
+    }
+
+    // Anschließend wird der Semaphor auf 1 gesetzt
+    semaphoreSetValue(sem_group_id, 0, 1);
 
     printf("Server listening on port %d...\n", PORT);
 

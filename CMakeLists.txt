@@ -10,6 +10,8 @@ add_executable(
         sub.h
         map.c
         map.h
+        semaphore.c
+        semaphore.h
 )
 
 target_link_libraries(Bhaga pthread)
