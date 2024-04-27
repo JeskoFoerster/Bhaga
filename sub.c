@@ -55,22 +55,15 @@ void handle_client(int client_socket, Map *map) {
  * @param client_socket The socket to write to.
  */
 void writeConnectionMessage(int client_socket) {
-    char commands[8][64] = {
-            "HELP -> Prints this information\n\r",
-            "GET <key> -> Prints value for the specified key\n\r",
-            "PUT <key> <value> -> Stores the specified key-value pair\n\r",
-            "DEL <key> -> Deletes the specified key\n\r",
-            "QUIT -> Exits the program\n\r",
-            "BEG -> Begins a transaction\n\r",
-            "END -> Ends a transaction\n\r",
-            "\n"
-    };
-
-    char overview[256] = "Available commands:\n\r";
-
-    for (int i = 0; i < 8; ++i) {
-        strcat(overview, commands[i]);
-    }
+    char overview[1024] = "Available commands:\n\r"
+                         "HELP -> Prints this information\n\r"
+                         "GET <key> -> Prints value for the specified key\n\r"
+                         "PUT <key> <value> -> Stores the specified key-value pair\n\r"
+                         "DEL <key> -> Deletes the specified key\n\r"
+                         "QUIT -> Exits the program\n\r"
+                         "BEG -> Begins a transaction\n\r"
+                         "END -> Ends a transaction\n\r"
+                         "\n";
 
     write(client_socket, overview, strlen(overview));
 }
