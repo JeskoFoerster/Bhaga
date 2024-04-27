@@ -2,6 +2,8 @@
 // Created by Jesko Förster on 18.04.2024.
 //
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 #ifndef MAP_H
 #define MAP_H
@@ -17,12 +19,6 @@ struct KeyValuePair {
 typedef struct {
     struct KeyValuePair table[MAP_SIZE];
 } Map;
-
-/**
- * @param key The key to hash.
- * @return The hash value (index).
- */
-unsigned int hash(const char* key);
 
 void map_insert_element(Map* map, const char* key, const char* value);
 

@@ -2,12 +2,7 @@
 // Created by Jesko Förster on 18.04.2024.
 //
 
-#include "main.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "sub.h"
 
 #define BUFFER_SIZE 1024
 
@@ -104,7 +99,6 @@ char** splitByWhiteSpace(const char* command, int* numSubarrays) {
     return result;
 }
 
-
 char* handle_command(Map *map, const char *command) {
 
     //split the command
@@ -199,4 +193,22 @@ char* handle_command(Map *map, const char *command) {
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
+}
+
+Map * createSharedMemoryMap(){
+    // Erstellen des Shared Memory
+    int shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);
+    if (shmid == -1) {
+        perror("shmget failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Anhängen des Shared Memory an den Prozess
+    Map * shar_mem_map = (Map *)shmat(shmid, 0, 0);
+    if (shar_mem_map == (void *)-1) {
+        perror("shmat failed");
+        exit(EXIT_FAILURE);
+    }
+
+    return shar_mem_map;
 }

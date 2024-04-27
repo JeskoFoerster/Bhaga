@@ -1,14 +1,4 @@
-#include "map.h"
-#include "sub.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#include "main.h"
 
 #define PORT 5678
 #define MAX_CLIENTS 5
@@ -44,19 +34,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // Erstellen des Shared Memory
-    int shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);
-    if (shmid == -1) {
-        perror("shmget failed");
-        exit(EXIT_FAILURE);
-    }
-
-    // Anhängen des Shared Memory an den Prozess
-    Map * shar_mem_map = (Map *)shmat(shmid, 0, 0);
-    if (shar_mem_map == (void *)-1) {
-        perror("shmat failed");
-        exit(EXIT_FAILURE);
-    }
+    Map * shar_mem_map = createSharedMemoryMap();
 
     printf("Server listening on port %d...\n", PORT);
 

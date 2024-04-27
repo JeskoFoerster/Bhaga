@@ -3,9 +3,6 @@
 //
 
 #include "map.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void map_insert_element(Map* map, const char* key, const char* value) {
     // Check if the key already exists and update the value if found
