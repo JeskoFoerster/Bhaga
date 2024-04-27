@@ -13,7 +13,7 @@ void handle_client(int client_socket, Map *map) {
     int input_length = 0;
 
     // Send initial message to client
-    write(client_socket, "Moegliche Befehle: GET, DEL, PUT, QUIT\n\r", 40);
+    writeConnectionMessage(client_socket);
 
     // Receive data from client and process it
     while ((bytes_read = read(client_socket, in, BUFFER_SIZE)) > 0) {
@@ -48,6 +48,31 @@ void handle_client(int client_socket, Map *map) {
 
     // Close client socket
     close(client_socket);
+}
+
+/**
+ * Writes an overview of available commands to the client socket.
+ * @param client_socket The socket to write to.
+ */
+void writeConnectionMessage(int client_socket) {
+    char commands[8][64] = {
+            "HELP -> Prints this information\n\r",
+            "GET <key> -> Prints value for the specified key\n\r",
+            "PUT <key> <value> -> Stores the specified key-value pair\n\r",
+            "DEL <key> -> Deletes the specified key\n\r",
+            "QUIT -> Exits the program\n\r",
+            "BEG -> Begins a transaction\n\r",
+            "END -> Ends a transaction\n\r",
+            "\n"
+    };
+
+    char overview[256] = "Available commands:\n\r";
+
+    for (int i = 0; i < 8; ++i) {
+        strcat(overview, commands[i]);
+    }
+
+    write(client_socket, overview, strlen(overview));
 }
 
 char** splitByWhiteSpace(const char* command, int* numSubarrays) {
