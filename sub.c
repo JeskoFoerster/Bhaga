@@ -252,7 +252,15 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
             strcpy(result, buffer); // Copy the formatted string into the allocated memory
             return result;
         }
+    }
+    else if(strcmp(method,"SUB") == 0){
+        const char* key = subarrays[1];
 
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Subing to %s\n\r", key);
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
     }
     else if(strcmp(method,"HELP") == 0){
         char overview[1024] = "Available commands:\n\r"
