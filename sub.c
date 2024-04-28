@@ -61,8 +61,8 @@ void writeConnectionMessage(int client_socket) {
                          "PUT <key> <value> -> Stores the specified key-value pair\n\r"
                          "DEL <key> -> Deletes the specified key\n\r"
                          "QUIT -> Exits the program\n\r"
-                         "BEG -> Begins a transaction\n\r"
-                         "END -> Ends a transaction\n\r"
+                         "BEG -> Begins a exclusive transaction\n\r"
+                         "END -> Ends a exclusive transaction\n\r"
                          "\n";
 
     write(client_socket, overview, strlen(overview));
@@ -205,11 +205,20 @@ char* handle_command(Map *map, const char *command) {
 
     }
     else if(strcmp(method,"HELP") == 0){
-        printf("<Help>\n\rPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n\r</Help>\n\r");
+        char overview[1024] = "Available commands:\n\r"
+                              "HELP -> Prints this information\n\r"
+                              "GET <key> -> Prints value for the specified key\n\r"
+                              "PUT <key> <value> -> Stores the specified key-value pair\n\r"
+                              "DEL <key> -> Deletes the specified key\n\r"
+                              "QUIT -> Exits the program\n\r"
+                              "BEG -> Begins a exclusive transaction\n\r"
+                              "END -> Ends a exclusive transaction\n\r"
+                              "\n";
+        printf(overview);
 
         //return value
-        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "<Help>\n\rPossible Commands: \"PUT\", \"GET\", \"DEL\", \"HELP\", \"QUIT\", \"BEG\", \"END\" \n\r</Help>\n\r");
+        char buffer[1024]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, overview);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
