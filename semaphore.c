@@ -14,7 +14,7 @@ int semaphoreSetValue(int sem_group_id, int sem_id, int value){
     values.sem_num = sem_id;
     values.sem_op = value;
     values.sem_flg = 0;
-    int result = semop(sem_group_id, &sem_op, 1);
+    int result = semop(sem_group_id, &values, 1);
     return result;
 }
 

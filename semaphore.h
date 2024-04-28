@@ -18,7 +18,7 @@ int semaphoreCreateGroup(int count);
 /**
  * Initializes the values of all semaphores in a semaphore group.
  * @param sem_group_id The ID of the semaphore group.
- * @param sem_id Ignored (for compatibility with future extensions).
+ * @param sem_id The index of the semaphore within the group.
  * @param value The initial value to set for all semaphores in the group.
  * @return 0 on success, -1 on error.
  */
