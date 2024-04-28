@@ -6,7 +6,7 @@
 
 #define BUFFER_SIZE 1024
 
-void handle_client(int client_socket, Map *map) {
+void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction) {
     char in[BUFFER_SIZE];
     int bytes_read;
     char full_input[BUFFER_SIZE];
@@ -34,7 +34,7 @@ void handle_client(int client_socket, Map *map) {
             printf("Received complete input from client: %s\n", full_input);
 
             // Write response to client
-            char *result = handle_command(map, full_input);
+            char *result = handle_command(map, full_input, sem_group_id, inTransaction);
             //destroy socket if demanded
             if (strcmp(result,"QUIT") == 0) {
                 write(client_socket, "Connection closed!", 18);
@@ -130,7 +130,7 @@ char** splitByWhiteSpace(const char* command, int* numSubarrays) {
     return result;
 }
 
-char* handle_command(Map *map, const char *command) {
+char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTransaction) {
 
     //split the command
     int numSubarrays;
@@ -144,6 +144,10 @@ char* handle_command(Map *map, const char *command) {
         return result;
     }
     else if(strcmp(method,"PUT") == 0){
+        if(!*inTransaction){
+            semaphoreDown(sem_group_id, 0);
+        }
+
         const char* key = subarrays[1];
         const char* value = subarrays[2];
         map_insert_element(map, key, value);
@@ -154,9 +158,18 @@ char* handle_command(Map *map, const char *command) {
         sprintf(buffer, "Inserted %s with the value %s\n\r", key, value);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
+
+        if(!*inTransaction){
+            semaphoreUp(sem_group_id, 0);
+        }
+
         return result;
     }
     else if(strcmp(method,"GET") == 0){
+        if(!*inTransaction){
+            semaphoreDown(sem_group_id, 0);
+        }
+
         const char* key = subarrays[1];
         const char* value = map_get_element(map, key);
         printf("Got: %s. The Value is: %s\n\r",key,value);
@@ -166,10 +179,18 @@ char* handle_command(Map *map, const char *command) {
         sprintf(buffer, "Got %s with it has the value %s\n\r", key, value);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
+
+        if(!*inTransaction){
+            semaphoreUp(sem_group_id, 0);
+        }
+
         return result;
     }
-    else if(strcmp(method,"DEL") == 0)
-    {
+    else if(strcmp(method,"DEL") == 0){
+        if(!*inTransaction){
+            semaphoreDown(sem_group_id, 0);
+        }
+
         const char* key = subarrays[1];
         map_delete_element(map, key);
         printf("Deleted: %s.\n\r",key);
@@ -179,29 +200,58 @@ char* handle_command(Map *map, const char *command) {
         sprintf(buffer, "Deleted %s form the Map\n\r", key);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
+
+        if(!*inTransaction){
+            semaphoreUp(sem_group_id, 0);
+        }
+
         return result;
     }
     else if(strcmp(method,"BEG") == 0){
-        printf("Beginning for transaction.\n\r");
-        printf("Yet to implement.\n\r");
+        if(!*inTransaction) {
+            printf("Beginning for transaction.\n\r");
+            printf("Yet to implement.\n\r");
 
-        //return value
-        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Starting exclusive connection to Map\n\r");
-        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
-        strcpy(result, buffer); // Copy the formatted string into the allocated memory
-        return result;
+            semaphoreDown(sem_group_id, 0);
+            *inTransaction = true;
+
+            //return value
+            char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+            sprintf(buffer, "Starting exclusive connection to Map\n\r");
+            char *result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+            strcpy(result, buffer); // Copy the formatted string into the allocated memory
+            return result;
+        } else {
+            //return value
+            char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+            sprintf(buffer, "Exclusivity not possible\n\r");
+            char *result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+            strcpy(result, buffer); // Copy the formatted string into the allocated memory
+            return result;
+        }
 
     }
     else if(strcmp(method,"END") == 0){
-        printf("Ending for transaction.\n\r");
+        if(*inTransaction) {
+            printf("Ending for transaction.\n\r");
 
-        //return value
-        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Ending exclusive connection to Map\n\r");
-        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
-        strcpy(result, buffer); // Copy the formatted string into the allocated memory
-        return result;
+            semaphoreUp(sem_group_id, 0);
+            *inTransaction = false;
+
+            //return value
+            char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+            sprintf(buffer, "Ending exclusive connection to Map\n\r");
+            char *result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+            strcpy(result, buffer); // Copy the formatted string into the allocated memory
+            return result;
+        } else {
+            //return value
+            char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+            sprintf(buffer, "This process has no exclusivity\n\r");
+            char *result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+            strcpy(result, buffer); // Copy the formatted string into the allocated memory
+            return result;
+        }
 
     }
     else if(strcmp(method,"HELP") == 0){

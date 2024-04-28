@@ -8,8 +8,10 @@
 #include <unistd.h>
 #include <sys/shm.h>
 #include <ctype.h>
+#include "semaphore.h"
+#include <stdbool.h>
 
-char* handle_command(Map *map, const char* command);
+char* handle_command(Map *map, const char* command, int sem_group_id, bool* inTransaction);
 char** splitByWhiteSpace(const char *longArray, int* numSubarrays);
-void handle_client(int client_socket, Map *map);
+void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction);
 void writeConnectionMessage(int client_socket);
