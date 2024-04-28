@@ -234,21 +234,3 @@ char* handle_command(Map *map, const char *command) {
         return result;
     }
 }
-
-Map * createSharedMemoryMap(){
-    // Erstellen des Shared Memory
-    int shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);
-    if (shmid == -1) {
-        perror("shmget failed");
-        exit(EXIT_FAILURE);
-    }
-
-    // Anhängen des Shared Memory an den Prozess
-    Map * shar_mem_map = (Map *)shmat(shmid, 0, 0);
-    if (shar_mem_map == (void *)-1) {
-        perror("shmat failed");
-        exit(EXIT_FAILURE);
-    }
-
-    return shar_mem_map;
-}

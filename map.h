@@ -20,6 +20,8 @@ typedef struct {
     struct KeyValuePair table[MAP_SIZE];
 } Map;
 
+Map * createSharedMemoryMap();
+
 void map_insert_element(Map* map, const char* key, const char* value);
 
 /**
