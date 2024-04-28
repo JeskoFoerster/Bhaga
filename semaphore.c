@@ -10,9 +10,11 @@ int semaphoreCreateGroup(int count){
 }
 
 int semaphoreSetValue(int sem_group_id, int sem_id, int value){
-    unsigned short marker[1];
-    marker[sem_id] = value;
-    int result = semctl(sem_group_id, value, SETALL, marker);
+    struct sembuf values;
+    values.sem_num = sem_id;
+    values.sem_op = value;
+    values.sem_flg = 0;
+    int result = semop(sem_group_id, &sem_op, 1);
     return result;
 }
 
