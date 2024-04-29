@@ -1,5 +1,3 @@
-#include <bits/mqueue.h>
-#include <mqueue.h>
 #include "main.h"
 
 #define PORT 5678
@@ -9,22 +7,6 @@
 
 
 int main() {
-    mqd_t mq;
-    struct mq_attr attr;
-    char buffer[MAX_MSG_SIZE];
-
-    // Set up the attributes for the message queue
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;  // Maximum number of messages
-    attr.mq_msgsize = MAX_MSG_SIZE;
-    attr.mq_curmsgs = 0;
-
-    // Open or create the message queue
-    mq = mq_open(QUEUE_NAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, &attr);
-    if (mq == -1) {
-        perror("mq_open");
-        exit(1);
-    }
 
     int server_socket, client_socket;
     int sem_group_id;
