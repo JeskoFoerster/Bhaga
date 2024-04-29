@@ -6,7 +6,7 @@
 
 #define BUFFER_SIZE 1024
 
-void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction) {
+void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction, int msg_q_id) {
     char in[BUFFER_SIZE];
     int bytes_read;
     char full_input[BUFFER_SIZE];
@@ -34,7 +34,7 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
             printf("Received complete input from client: %s\n", full_input);
 
             // Write response to client
-            char *result = handle_command(map, full_input, sem_group_id, inTransaction);
+            char *result = handle_command(map, full_input, sem_group_id, inTransaction, msg_q_id);
             //destroy socket if demanded
             if (strcmp(result,"QUIT") == 0) {
                 write(client_socket, "Connection closed!", 18);
@@ -130,7 +130,7 @@ char** splitByWhiteSpace(const char* command, int* numSubarrays) {
     return result;
 }
 
-char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTransaction) {
+char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTransaction, int msg_q_id) {
 
     //split the command
     int numSubarrays;
@@ -152,6 +152,13 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         const char* value = subarrays[2];
         map_insert_element(map, key, value);
         printf("Inserted: %s and %s.\n\r",key,value);
+
+        //send msg
+        int rc = messageSendPUT(msg_q_id, subarrays[1], subarrays[2]);
+        if(rc < 0){
+            perror("Fehler beim senden der PUT Nachricht!");
+            exit(1);
+        }
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed

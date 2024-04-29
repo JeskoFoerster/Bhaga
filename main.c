@@ -50,6 +50,13 @@ int main() {
     // Anschließend wird der Semaphor auf 1 gesetzt
     semaphoreSetValue(sem_group_id, 0, 1);
 
+    // Anlegen einer Nachrichtenschlange
+    int msg_q_id = messageQueueCreate();
+    if (msg_q_id < 0) {
+        perror("Fehler beim erstellen der Nachrichtenschlange!");
+        exit(1);
+    }
+
     printf("Server listening on port %d...\n", PORT);
 
     // Accept incoming connections and handle them
@@ -76,7 +83,7 @@ int main() {
             close(server_socket); // Close server socket in child process
 
             // Handle client in child process
-            handle_client(client_socket, shar_mem_map, sem_group_id, &inTransaction);
+            handle_client(client_socket, shar_mem_map, sem_group_id, &inTransaction, msg_q_id);
 
             // Close client socket and exit child process
             close(client_socket);

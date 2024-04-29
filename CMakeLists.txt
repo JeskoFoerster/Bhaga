@@ -12,6 +12,8 @@ add_executable(
         map.h
         semaphore.c
         semaphore.h
+        messages.h
+        messages.c
 )
 
 target_link_libraries(Bhaga pthread)
