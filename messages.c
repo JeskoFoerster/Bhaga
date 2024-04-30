@@ -46,16 +46,20 @@ int messageSendPUT(int msg_q_id, char*key, char*value){
     return rc;
 }
 
-int messageSendToAllPUT(int * msg_q_ids, char*key, char*value){
+int messageSendToAllPUT(int own_msg_q_id, int * msg_q_ids, char*key, char*value){
 
     // Nachricht vorbereiten
     struct msg_buffer message;
     message.msg_type = MSG_PUT_TYPE;
-    snprintf(message.msg_text, MSG_SIZE, "PUT %s %s", key, value);
+    snprintf(message.msg_text, MSG_SIZE, "UPDATE %s %s\n\r", key, value);
 
     // Nachricht senden
     int i = 0;
     while(i < MAX_CLIENTS && msg_q_ids[i]!=0){
+        if(msg_q_ids[i] == own_msg_q_id){
+            i++;
+            continue;
+        }
         printf("ID: %i", msg_q_ids[i]);
         int rc = msgsnd(msg_q_ids[i], &message, sizeof(message.msg_text), 0);
         if(rc < 0){
@@ -67,4 +71,23 @@ int messageSendToAllPUT(int * msg_q_ids, char*key, char*value){
     }
 
     return 0;
+}
+
+char* receiveMessageContent(int msg_q_id) {
+    // Nachricht empfangen
+    struct msg_buffer message;
+    int rc = msgrcv(msg_q_id, &message, sizeof(message.msg_text), MSG_PUT_TYPE, IPC_NOWAIT);
+    if (rc < 0) {
+        return "";
+    }
+
+    // Speicher für den Nachrichteninhalt dynamisch zuweisen und kopieren
+    char *content = (char *)malloc(strlen(message.msg_text) + 1);
+    if (content == NULL) {
+        perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
+    strcpy(content, message.msg_text);
+
+    return content;
 }
