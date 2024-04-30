@@ -49,7 +49,21 @@ const char* map_get_element(Map* map, const char* key) {
     // Key not found
     return NULL;
 }
-
+char** map_getall_elements(Map* map, char** results) {
+    results = (char**)malloc(MAP_SIZE * sizeof(char*));
+    //char buffer[50];
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (map->table[i].key != NULL && map->table[i].value != NULL) {
+            //results[i] = malloc(strlen(buffer) + 1);
+            strcpy(results[i], map->table[i].key);
+            strcat(results[i], " ");
+            strcat(results[i], map->table[i].value);
+        } else {
+            results[i] = "NULL!";
+        }
+    }
+    return results;
+}
 void map_delete_element(Map* map, const char* key) {
     // Check if the key exists
     for (int i = 0; i < MAP_SIZE; i++) {

@@ -288,6 +288,29 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
+    else if (strcmp(method,"GETALL") == 0) {
+        if(!*inTransaction){
+            semaphoreDown(sem_group_id, 0);
+        }
+        char buffer[100];
+        sprintf(buffer, "Here are all keys and their values:\n\r");
+
+        char** results;// = (char**)malloc(MAP_SIZE * sizeof(char*));
+        map_getall_elements(map, results);
+
+        for (int i = 0; i < MAP_SIZE; i++) {
+            printf("->%s\n\r",results[i]);
+            sprintf(buffer, "->%s\n\r",results[i]);
+        }
+        free(results);
+        if(!*inTransaction){
+            semaphoreUp(sem_group_id, 0);
+        }
+        //return value
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
+        return result;
+    }
     else{
         printf("Command not found, please enter a valid command. Enter \"HELP\" to so see possible commands.\n\r");
 
