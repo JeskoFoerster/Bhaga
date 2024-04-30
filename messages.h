@@ -39,4 +39,8 @@ int messageQueueCreate();
  */
 int messageSendPUT(int msg_q_id, char*key, char*value);
 
+int messageSendToAllPUT(int * msg_q_ids, char*key, char*value);
+
+void messageQueueInfo(int msg_q_id);
+
 #endif //BHAGA_MESSAGES_H
