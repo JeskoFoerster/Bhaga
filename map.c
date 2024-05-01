@@ -49,17 +49,18 @@ const char* map_get_element(Map* map, const char* key) {
     // Key not found
     return NULL;
 }
-char** map_getall_elements(Map* map, char** results) {
-    results = (char**)malloc(MAP_SIZE * sizeof(char*));
-    //char buffer[50];
+char* map_getall_elements(Map* map) {
+    char* results = malloc((MAP_SIZE+1) * sizeof(char));
+    char ending[4];
     for (int i = 0; i < MAP_SIZE; i++) {
         if (map->table[i].key != NULL && map->table[i].value != NULL) {
-            //results[i] = malloc(strlen(buffer) + 1);
-            strcpy(results[i], map->table[i].key);
-            strcat(results[i], " ");
-            strcat(results[i], map->table[i].value);
+            strcat(results, map->table[i].key);
+            strcat(results, " ");
+            strcat(results, map->table[i].value);
+            sprintf(ending,"\n\r");
+            //strcat(results, ending);
         } else {
-            results[i] = "NULL!";
+            strcat(results, "NULL!");
         }
     }
     return results;

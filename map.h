@@ -29,7 +29,7 @@ void map_insert_element(Map* map, const char* key, const char* value);
  */
 const char* map_get_element(Map* map, const char* key);
 
-char** map_getall_elements(Map* map, char** results);
+char* map_getall_elements(Map* map);
 
 void map_delete_element(Map* map, const char* key);
 
