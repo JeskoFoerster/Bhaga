@@ -2,9 +2,6 @@
 
 #define PORT 5678
 #define MAX_CLIENTS 5
-#define QUEUE_NAME "/bhaga_queue"
-#define MAX_MSG_SIZE 256
-
 
 int main() {
 

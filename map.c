@@ -49,7 +49,20 @@ const char* map_get_element(Map* map, const char* key) {
     // Key not found
     return NULL;
 }
-
+char* map_getall_elements(Map* map) {
+    char* results = malloc(100*MAP_SIZE * sizeof(char));
+    char ending[4];
+    sprintf(ending,"\n\r");
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (strcmp(map->table[i].key,"")!=0) {
+            strcat(results, map->table[i].key);
+            strcat(results, " ");
+            strcat(results, map->table[i].value);
+            strcat(results, ending);
+        }
+    }
+    return results;
+}
 void map_delete_element(Map* map, const char* key) {
     // Check if the key exists
     for (int i = 0; i < MAP_SIZE; i++) {
@@ -58,6 +71,15 @@ void map_delete_element(Map* map, const char* key) {
             map->table[i].key[0] = '\0';
             map->table[i].value[0] = '\0';
             return;
+        }
+    }
+}
+
+void map_deleteall_elements(Map* map) {
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (map->table[i].key != NULL) {
+            map->table[i].key[0] = '\0';
+            map->table[i].value[0] = '\0';
         }
     }
 }

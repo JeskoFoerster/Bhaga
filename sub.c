@@ -127,8 +127,10 @@ void writeConnectionMessage(int client_socket) {
     char overview[1024] = "Available commands:\n\r"
                          "HELP -> Prints this information\n\r"
                          "GET <key> -> Prints value for the specified key\n\r"
+                         "GETALL -> Prints all keys and their values\n\r"
                          "PUT <key> <value> -> Stores the specified key-value pair\n\r"
                          "DEL <key> -> Deletes the specified key\n\r"
+                         "DELALL -> Deletes all items\n\r"
                          "QUIT -> Exits the program\n\r"
                          "BEG -> Begins a exclusive transaction\n\r"
                          "END -> Ends a exclusive transaction\n\r"
@@ -269,9 +271,27 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Deleted %s form the Map\n\r", key);
+        sprintf(buffer, "Deleted %s from the Map\n\r", key);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
+
+        if(!*inTransaction){
+            semaphoreUp(sem_group_id, 0);
+        }
+
+        return result;
+    }
+    else if (strcmp(method,"DELALL") == 0) {
+        if(!*inTransaction){
+            semaphoreDown(sem_group_id, 0);
+        }
+        map_deleteall_elements(map);
+
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Deleted all items from the map\n\r");
+        char* result = malloc(strlen(buffer) +1); // Allocate memory for the string
+        strcpy(result,buffer); // Copy the formatted string into the allocated memory
 
         if(!*inTransaction){
             semaphoreUp(sem_group_id, 0);
@@ -338,8 +358,10 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         char overview[1024] = "Available commands:\n\r"
                               "HELP -> Prints this information\n\r"
                               "GET <key> -> Prints value for the specified key\n\r"
+                              "GETALL -> Prints all keys and their values\n\r"
                               "PUT <key> <value> -> Stores the specified key-value pair\n\r"
                               "DEL <key> -> Deletes the specified key\n\r"
+                              "DELALL -> Deletes all items\n\r"
                               "QUIT -> Exits the program\n\r"
                               "BEG -> Begins a exclusive transaction\n\r"
                               "END -> Ends a exclusive transaction\n\r"
@@ -351,6 +373,26 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         sprintf(buffer, overview);
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
+        return result;
+    }
+    else if (strcmp(method,"GETALL") == 0) {
+        char buffer[1024];
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+
+        if(!*inTransaction){
+            semaphoreDown(sem_group_id, 0);
+        }
+        sprintf(buffer, "Here are all keys and their values:\n\r");
+        strcpy(result, buffer);
+        char* r = map_getall_elements(map);
+        sprintf(buffer, r);
+        strcat(result, buffer);
+
+        if(!*inTransaction){
+            semaphoreUp(sem_group_id, 0);
+        }
+        //return value
+        //strcpy(result, buffer); // Copy the formatted string into the allocated memory
         return result;
     }
     else{
