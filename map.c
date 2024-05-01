@@ -75,6 +75,15 @@ void map_delete_element(Map* map, const char* key) {
     }
 }
 
+void map_deleteall_elements(Map* map) {
+    for (int i = 0; i < MAP_SIZE; i++) {
+        if (map->table[i].key != NULL) {
+            map->table[i].key[0] = '\0';
+            map->table[i].value[0] = '\0';
+        }
+    }
+}
+
 Map * createSharedMemoryMap(){
     // Erstellen des Shared Memory
     int shmid = shmget(IPC_PRIVATE, sizeof(Map), IPC_CREAT|0600);

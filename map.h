@@ -33,4 +33,6 @@ char* map_getall_elements(Map* map);
 
 void map_delete_element(Map* map, const char* key);
 
+void map_deleteall_elements(Map* map);
+
 #endif
