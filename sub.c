@@ -298,7 +298,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         sprintf(buffer, "Here are all keys and their values:\n\r");
         strcpy(result, buffer);
         char* r = map_getall_elements(map);
-        strcpy(buffer, r);
+        sprintf(buffer, r);
         strcat(result, buffer);
 
         if(!*inTransaction){

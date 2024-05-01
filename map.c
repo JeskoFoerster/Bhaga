@@ -50,17 +50,15 @@ const char* map_get_element(Map* map, const char* key) {
     return NULL;
 }
 char* map_getall_elements(Map* map) {
-    char* results = malloc((MAP_SIZE+1) * sizeof(char));
+    char* results = malloc(100*MAP_SIZE * sizeof(char));
     char ending[4];
+    sprintf(ending,"\n\r");
     for (int i = 0; i < MAP_SIZE; i++) {
-        if (map->table[i].key != NULL && map->table[i].value != NULL) {
+        if (strcmp(map->table[i].key,"")!=0) {
             strcat(results, map->table[i].key);
             strcat(results, " ");
             strcat(results, map->table[i].value);
-            sprintf(ending,"\n\r");
-            //strcat(results, ending);
-        } else {
-            strcat(results, "NULL!");
+            strcat(results, ending);
         }
     }
     return results;
