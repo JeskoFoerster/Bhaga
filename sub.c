@@ -15,7 +15,62 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
     // Send initial message to client
     writeConnectionMessage(client_socket);
 
+    //NEW
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("Fehler beim Forken");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        // Kindprozess - Empfangen von Nachrichten
+        while (1) {
+            {
+                char * receivedContent = receiveMessageContent(msg_q_id);
+                if (strlen(receivedContent) > 0) {
+                    write(client_socket, receivedContent, strlen(receivedContent));
+                    printf("Received message content: %s\n", receivedContent);
+                }
+            }
+        }
+    } else {
+        // Elternprozess - Verarbeiten von Befehlen und Senden von Antworten
+        while ((bytes_read = read(client_socket, in, BUFFER_SIZE))) {
+            if (bytes_read > 0) {
+
+                // Add received data to full_input
+                strncpy(full_input + input_length, in, bytes_read);
+                input_length += bytes_read;
+
+                // Check if the last character is a newline
+                if (in[bytes_read - 1] == '\n') {
+                    // Remove trailing "\r\n" characters
+                    if (input_length >= 2 && full_input[input_length - 2] == '\r' &&
+                        full_input[input_length - 1] == '\n') {
+                        full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
+                        full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
+                        input_length -= 2; // Adjust input length
+                    }
+
+                    // Print received command and handle it
+                    printf("Received complete input from client: %s\n", full_input);
+
+                    // Write response to client
+                    char *result = handle_command(map, full_input, sem_group_id, inTransaction, msg_q_id, msg_q_ids);
+                    //destroy socket if demanded
+                    if (strcmp(result, "QUIT") == 0) {
+                        write(client_socket, "Connection closed!", 18);
+                        close(client_socket);
+                    }
+                    write(client_socket, result, strlen(result)); // Send result to client
+                    free(result); // Free dynamically allocated result
+                    input_length = 0; // Reset input_length for next command
+                }
+            }
+        }
+    }
+    //NEW END
+
     // Receive data from client and process it
+    /*
     while ((bytes_read = read(client_socket, in, BUFFER_SIZE))) {
         if(bytes_read > 0){
 
@@ -58,6 +113,7 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
             }
         }
     }
+    */
 
     // Close client socket
     close(client_socket);
