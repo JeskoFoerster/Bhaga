@@ -10,7 +10,7 @@ Der Name "Bhaga" wurde gewählt, da "Bhaga" eine Figur aus der indischen Mytholo
 
 ## Vorschau
 
-<img src="https://i.ibb.co/tPK8QW6/Sequenz-03-1.gif" alt="preview1" title="preview1" width="500"/>
+<img src="https://i.ibb.co/tPK8QW6/Sequenz-03-1.gif" alt="preview1" title="preview1" width="100%"/>
 
 ## Teammitglieder
 
