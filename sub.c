@@ -325,7 +325,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
     }
-    else if(strcmp(method,"UNSUBALL\n\r") == 0){
+    else if(strcmp(method,"UNSUBALL") == 0){
 
         clearSubscriptions(sub_list);
 
