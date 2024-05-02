@@ -5,7 +5,7 @@
 #include "messages.h"
 #define MAX_CLIENTS 5
 
-int messageQueueCreate(int msg_q_id){
+int messageQueueCreate(){
     return msgget(IPC_PRIVATE, IPC_CREAT | 0644);
 }
 

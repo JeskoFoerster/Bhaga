@@ -23,29 +23,57 @@ struct msg_buffer {
 };
 
 /**
- * This function creates a new message queue and returns its identifier.
+ * Creates a new message queue or returns the ID of an existing one.
  *
- * @return Returns the identifier of the new message queue on success, or -1 on failure.
+ * @param msg_q_id The ID of the message queue.
+ * @return The ID of the message queue created or accessed.
  */
 int messageQueueCreate();
 
 /**
- * This function prepares a PUT message with the provided key and value,
- * then sends it to the specified message queue with PUT operation.
+ * Sends a PUT message to a specified message queue.
  *
- * @param msg_q_id The message queue identifier.
- * @param key The key for the message.
- * @param value The value for the message.
- * @return Returns 0 on success, -1 on failure.
+ * @param msg_q_id The ID of the message queue to send the message to.
+ * @param key The key part of the message.
+ * @param value The value part of the message.
+ * @return Returns 0 on success, or -1 on failure.
  */
 int messageSendPUT(int msg_q_id, char*key, char*value);
 
+/**
+ * Sends a PUT message to all specified message queues except the one with the own_msg_q_id.
+ *
+ * @param own_msg_q_id The ID of the message queue to exclude from sending.
+ * @param msg_q_ids Array of message queue IDs to send the message to.
+ * @param key The key part of the message.
+ * @param value The value part of the message.
+ * @return Returns 0 on success, or -1 on failure.
+ */
 int messageSendToAllPUT(int own_msg_q_id, int * msg_q_ids, char*key, char*value);
 
+/**
+ * Prints information about the specified message queue.
+ *
+ * @param msg_q_id The ID of the message queue.
+ */
 void messageQueueInfo(int msg_q_id);
 
+/**
+ * Receives the content of a message from the specified message queue and returns it.
+ *
+ * @param msg_q_id The ID of the message queue.
+ * @param sub_list A pointer to the SubscriptionArray to check subscription.
+ * @return The content of the received message, or an empty string if no message is received or the key is not subscribed.
+ */
 char* receiveMessageContent(int msg_q_id, SubscriptionArray * sub_list);
 
+/**
+ * Splits a message into key and value parts.
+ *
+ * @param message The message to split.
+ * @param key A pointer to store the key part.
+ * @param value A pointer to store the value part.
+ */
 void splitMessage(const char *message, char **key, char **value);
 
 #endif //BHAGA_MESSAGES_H
