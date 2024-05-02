@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include "subscriptions.h"
 
 #define MSG_PUT_TYPE 11
 #define MSG_SIZE 128
@@ -43,6 +44,8 @@ int messageSendToAllPUT(int own_msg_q_id, int * msg_q_ids, char*key, char*value)
 
 void messageQueueInfo(int msg_q_id);
 
-char* receiveMessageContent(int msg_q_id);
+char* receiveMessageContent(int msg_q_id, SubscriptionArray * sub_list);
+
+void splitMessage(const char *message, char **key, char **value);
 
 #endif //BHAGA_MESSAGES_H

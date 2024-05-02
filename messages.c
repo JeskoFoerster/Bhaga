@@ -51,7 +51,7 @@ int messageSendToAllPUT(int own_msg_q_id, int * msg_q_ids, char*key, char*value)
     // Nachricht vorbereiten
     struct msg_buffer message;
     message.msg_type = MSG_PUT_TYPE;
-    snprintf(message.msg_text, MSG_SIZE, "UPDATE %s %s\n\r", key, value);
+    snprintf(message.msg_text, MSG_SIZE, "%s:%s\n\r", key, value);
 
     // Nachricht senden
     int i = 0;
@@ -73,7 +73,7 @@ int messageSendToAllPUT(int own_msg_q_id, int * msg_q_ids, char*key, char*value)
     return 0;
 }
 
-char* receiveMessageContent(int msg_q_id) {
+char* receiveMessageContent(int msg_q_id, SubscriptionArray * sub_list) {
     // Nachricht empfangen
     struct msg_buffer message;
     int rc = msgrcv(msg_q_id, &message, sizeof(message.msg_text), MSG_PUT_TYPE, IPC_NOWAIT);
@@ -89,5 +89,49 @@ char* receiveMessageContent(int msg_q_id) {
     }
     strcpy(content, message.msg_text);
 
-    return content;
+    //Nachricht in Bestandteile splitten
+    char *key, *value;
+    splitMessage(content, &key, &value);
+
+    if(isSubscribed(sub_list, key) == 0){
+        return "";
+    };
+
+    // Rückgabemitteilung zusammenbauen
+    char *return_message = (char *)malloc(strlen(key) + strlen(value) + 9); // 9 for "UPDATE "
+    if (return_message == NULL) {
+        perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
+    sprintf(return_message, "UPDATE %s %s", key, value);
+
+    return return_message;
+}
+
+void splitMessage(const char *message, char **key, char **value) {
+    // Find the position of the colon
+    char *colon_pos = strchr(message, ':');
+    if (colon_pos == NULL) {
+        *key = NULL;
+        *value = NULL;
+        return;
+    }
+
+    // Calculate the length of the key and value
+    int key_length = colon_pos - message;
+    int value_length = strlen(colon_pos + 1);
+
+    // Allocate memory for key and value
+    *key = (char *)malloc((key_length + 1) * sizeof(char));
+    *value = (char *)malloc((value_length + 1) * sizeof(char));
+
+    if (*key == NULL || *value == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Copy key and value from the message
+    strncpy(*key, message, key_length);
+    (*key)[key_length] = '\0';
+    strcpy(*value, colon_pos + 1);
 }

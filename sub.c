@@ -26,7 +26,7 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
         // Kindprozess - Empfangen von Nachrichten
         while (1) {
             {
-                char * receivedContent = receiveMessageContent(msg_q_id);
+                char * receivedContent = receiveMessageContent(msg_q_id, sub_list);
                 if (strlen(receivedContent) > 0) {
                     write(client_socket, receivedContent, strlen(receivedContent));
                     printf("Received message content: %s\n", receivedContent);

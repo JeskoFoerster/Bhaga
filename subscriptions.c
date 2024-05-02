@@ -57,9 +57,9 @@ void clearSubscriptions(SubscriptionArray * array) {
     printf("All subscriptions cleared.\n");
 }
 
-int isSubscribed(SubscriptionArray * array, const char * subscription) {
-    for (int i = 0; i < array->count; ++i) {
-        if (strcmp(array->subscriptions[i], subscription) == 0) {
+int isSubscribed(SubscriptionArray * sub_list, const char * subscription) {
+    for (int i = 0; i < sub_list->count; ++i) {
+        if (strcmp(sub_list->subscriptions[i], subscription) == 0) {
             return 1; // Subscription found
         }
     }
