@@ -5,8 +5,6 @@
 
 int main() {
 
-    int server_socket, client_socket;
-    int sem_group_id;
     bool inTransaction = false;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
@@ -18,7 +16,7 @@ int main() {
     }
 
     // Create server socket
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    int server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1) {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
@@ -44,10 +42,10 @@ int main() {
 
     Map * shar_mem_map = createSharedMemoryMap();
 
-    sem_group_id = semaphoreCreateGroup(1);
+    int sem_group_id = semaphoreCreateGroup(1);
     if (sem_group_id == -1) {
         perror ("Die Gruppe konnte nicht angelegt werden!");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     // Anschließend wird der Semaphor auf 1 gesetzt
@@ -55,6 +53,7 @@ int main() {
 
     printf("Server listening on port %d...\n", PORT);
 
+    int client_socket;
     // Accept incoming connections and handle them
     while (1) {
         // Accept a client connection

@@ -85,7 +85,7 @@ void writeConnectionMessage(int client_socket) {
                          "GETALL -> Prints all keys and their values\n\r"
                          "PUT <key> <value> -> Stores the specified key-value pair\n\r"
                          "DEL <key> -> Deletes the specified key\n\r"
-                         "DELALL -> Deletes all items\n\r"
+                         "DELALL -> Deletes all key-value pairs\n\r"
                          "QUIT -> Exits the program\n\r"
                          "BEG -> Begins a exclusive transaction\n\r"
                          "END -> Ends a exclusive transaction\n\r"
@@ -262,7 +262,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
     }
     else if(strcmp(method,"BEG") == 0){
         if(!*inTransaction) {
-            printf("Beginning for transaction.\n\r");
+            printf("Beginning of transaction.\n\r");
             printf("Yet to implement.\n\r");
 
             semaphoreDown(sem_group_id, 0);
