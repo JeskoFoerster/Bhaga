@@ -5,15 +5,6 @@
 #include "subscriptions.h"
 
 SubscriptionArray * createSharedSubscriptionArray() {
-    /*
-    SubscriptionArray * newArray = (SubscriptionArray *)malloc(sizeof(SubscriptionArray));
-    if (newArray == NULL) {
-        perror("Memory allocation failed");
-        exit(EXIT_FAILURE);
-    }
-    newArray->count = 0;
-    return newArray;
-     */
     // Erstellen des Shared Memory
     int shmid = shmget(IPC_PRIVATE, sizeof(SubscriptionArray), IPC_CREAT|0600);
     if (shmid == -1) {

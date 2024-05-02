@@ -89,6 +89,8 @@ void writeConnectionMessage(int client_socket) {
                          "QUIT -> Exits the program\n\r"
                          "BEG -> Begins a exclusive transaction\n\r"
                          "END -> Ends a exclusive transaction\n\r"
+                         "SUB <key> -> Subscribe to a key\n\r"
+                         "UNSUB <key> -> Unsubscribe a key\n\r"
                          "\n";
 
     write(client_socket, overview, strlen(overview));
@@ -311,6 +313,17 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
     }
+    else if(strcmp(method,"UNSUB") == 0){
+        const char* key = subarrays[1];
+
+        removeSubscription(sub_list, key);
+
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Unsubing %s\n\r", key);
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
+    }
     else if(strcmp(method,"HELP") == 0){
         char overview[1024] = "Available commands:\n\r"
                               "HELP -> Prints this information\n\r"
@@ -322,6 +335,8 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
                               "QUIT -> Exits the program\n\r"
                               "BEG -> Begins a exclusive transaction\n\r"
                               "END -> Ends a exclusive transaction\n\r"
+                              "SUB <key> -> Subscribe to a key\n\r"
+                              "UNSUB <key> -> Unsubscribe a key\n\r"
                               "\n";
         printf(overview);
 
