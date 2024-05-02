@@ -8,6 +8,10 @@ Das Projekt "Bhaga" konzentriert sich auf die Entwicklung und Implementierung ve
 
 Der Name "Bhaga" wurde gewählt, da "Bhaga" eine Figur aus der indischen Mythologie ist und im Rigveda, einer der heiligen Schriften des Hinduismus, als Verteiler und Segenspender verehrt wird. Dieser Name wurde gewählt, um die Idee der Verteilung und des Teilens von Ressourcen in unserem System zu symbolisieren.
 
+## Vorschau
+
+<img src="https://i.ibb.co/tXgSyv5/Sequenz-03-1.gif" alt="Sequenz-03-1" border="0" style="width: 1000px;" />
+
 ## Teammitglieder
 
 - Jesko Förster
