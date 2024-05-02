@@ -23,3 +23,8 @@ Der Name "Bhaga" wurde gewählt, da "Bhaga" eine Figur aus der indischen Mytholo
 ## Beiträge
 
 Wir freuen uns über Beiträge zum Projekt "Bhaga". Wenn Sie etwas beitragen möchten, öffnen Sie bitte ein Issue oder senden Sie uns eine Pull-Anfrage.
+
+## 
+Gruppe: 1
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/TH_Koeln_Logo.svg" alt="TH Köln Logo" width="100" height="100">
