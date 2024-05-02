@@ -13,7 +13,7 @@
  * @param count The number of semaphores to create in the group.
  * @return The semaphore group ID on success, -1 on error.
  */
-int semaphoreCreateGroup(int count);
+int semaphore_create_group(int count);
 
 /**
  * Initializes the values of all semaphores in a semaphore group.
@@ -22,7 +22,7 @@ int semaphoreCreateGroup(int count);
  * @param value The initial value to set for all semaphores in the group.
  * @return 0 on success, -1 on error.
  */
-int semaphoreSetValue(int sem_group_id, int sem_id, int value);
+int semaphore_set_value(int sem_group_id, int sem_id, int value);
 
 /**
  * Decrements the value of a specific semaphore in a semaphore group,
@@ -32,7 +32,7 @@ int semaphoreSetValue(int sem_group_id, int sem_id, int value);
  * @param sem_id The index of the semaphore within the group to decrement.
  * @return 0 on success, -1 on error.
  */
-int semaphoreDown(int sem_group_id, int sem_id);
+int semaphore_down(int sem_group_id, int sem_id);
 
 /**
  * Increments the value of a specific semaphore in a semaphore group.
@@ -40,4 +40,4 @@ int semaphoreDown(int sem_group_id, int sem_id);
  * @param sem_id The index of the semaphore within the group to increment.
  * @return 0 on success, -1 on error.
  */
-int semaphoreUp(int sem_group_id, int sem_id);
+int semaphore_up(int sem_group_id, int sem_id);

@@ -46,7 +46,7 @@ char** splitByWhiteSpace(const char *longArray, int* numSubarrays);
  * @param sub_list A pointer to the SubscriptionArray structure.
  * @return The response to the command.
  */
-void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction, int msg_q_id, int * msg_q_ids);
+_Noreturn void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction, int msg_q_id, int * msg_q_ids);
 
 /**
  * Writes an overview of available commands to the client socket.

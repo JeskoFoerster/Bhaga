@@ -4,12 +4,12 @@
 
 #include "semaphore.h"
 
-int semaphoreCreateGroup(int count){
+int semaphore_create_group(int count){
     int sem_group_id = semget (IPC_PRIVATE, count, IPC_CREAT|0644);
     return sem_group_id;
 }
 
-int semaphoreSetValue(int sem_group_id, int sem_id, int value){
+int semaphore_set_value(int sem_group_id, int sem_id, int value){
     struct sembuf values;
     values.sem_num = sem_id;
     values.sem_op = value;
@@ -18,7 +18,7 @@ int semaphoreSetValue(int sem_group_id, int sem_id, int value){
     return result;
 }
 
-int semaphoreDown(int sem_group_id, int sem_id){
+int semaphore_down(int sem_group_id, int sem_id){
     struct sembuf values;
     values.sem_num = sem_id;
     values.sem_flg = SEM_UNDO;
@@ -27,7 +27,7 @@ int semaphoreDown(int sem_group_id, int sem_id){
     return result;
 }
 
-int semaphoreUp(int sem_group_id, int sem_id){
+int semaphore_up(int sem_group_id, int sem_id){
     struct sembuf values;
     values.sem_num = sem_id;
     values.sem_flg = SEM_UNDO;

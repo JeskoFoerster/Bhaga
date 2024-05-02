@@ -6,7 +6,7 @@
 
 #define BUFFER_SIZE 1024
 
-void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction, int msg_q_id, int * msg_q_ids) {
+_Noreturn void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransaction, int msg_q_id, int * msg_q_ids) {
     char in[BUFFER_SIZE];
     int bytes_read;
     char full_input[BUFFER_SIZE];
@@ -24,7 +24,7 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
         // Kindprozess - Empfangen von Nachrichten
-        while (1) {
+        while (true) {
             {
                 char * receivedContent = receiveMessageContent(msg_q_id, sub_list);
                 if (strlen(receivedContent) > 0) {
@@ -174,7 +174,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
     }
     else if(strcmp(method,"PUT") == 0){
         if(!*inTransaction){
-            semaphoreDown(sem_group_id, 0);
+            semaphore_down(sem_group_id, 0);
         }
 
         const char* key = subarrays[1];
@@ -192,14 +192,14 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
 
         if(!*inTransaction){
-            semaphoreUp(sem_group_id, 0);
+            semaphore_up(sem_group_id, 0);
         }
 
         return result;
     }
     else if(strcmp(method,"GET") == 0){
         if(!*inTransaction){
-            semaphoreDown(sem_group_id, 0);
+            semaphore_down(sem_group_id, 0);
         }
 
         const char* key = subarrays[1];
@@ -213,14 +213,14 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
 
         if(!*inTransaction){
-            semaphoreUp(sem_group_id, 0);
+            semaphore_up(sem_group_id, 0);
         }
 
         return result;
     }
     else if(strcmp(method,"DEL") == 0){
         if(!*inTransaction){
-            semaphoreDown(sem_group_id, 0);
+            semaphore_down(sem_group_id, 0);
         }
 
         const char* key = subarrays[1];
@@ -237,14 +237,14 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
 
         if(!*inTransaction){
-            semaphoreUp(sem_group_id, 0);
+            semaphore_up(sem_group_id, 0);
         }
 
         return result;
     }
     else if (strcmp(method,"DELALL") == 0) {
         if(!*inTransaction){
-            semaphoreDown(sem_group_id, 0);
+            semaphore_down(sem_group_id, 0);
         }
         map_deleteall_elements(map);
 
@@ -255,7 +255,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         strcpy(result,buffer); // Copy the formatted string into the allocated memory
 
         if(!*inTransaction){
-            semaphoreUp(sem_group_id, 0);
+            semaphore_up(sem_group_id, 0);
         }
 
         return result;
@@ -265,7 +265,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
             printf("Beginning of transaction.\n\r");
             printf("Yet to implement.\n\r");
 
-            semaphoreDown(sem_group_id, 0);
+            semaphore_down(sem_group_id, 0);
             *inTransaction = true;
 
             //return value
@@ -288,7 +288,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         if(*inTransaction) {
             printf("Ending for transaction.\n\r");
 
-            semaphoreUp(sem_group_id, 0);
+            semaphore_up(sem_group_id, 0);
             *inTransaction = false;
 
             //return value
@@ -367,7 +367,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
 
         if(!*inTransaction){
-            semaphoreDown(sem_group_id, 0);
+            semaphore_down(sem_group_id, 0);
         }
         sprintf(buffer, "Here are all keys and their values:\n\r");
         strcpy(result, buffer);
@@ -376,7 +376,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         strcat(result, buffer);
 
         if(!*inTransaction){
-            semaphoreUp(sem_group_id, 0);
+            semaphore_up(sem_group_id, 0);
         }
         //return value
         //strcpy(result, buffer); // Copy the formatted string into the allocated memory

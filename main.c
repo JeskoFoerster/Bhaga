@@ -9,8 +9,8 @@ int main() {
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 
-    int shmid = shmget(IPC_PRIVATE, MAX_CLIENTS * sizeof(int), IPC_CREAT|0600);
-    int *msg_q_ids = (int *)shmat(shmid, 0, 0);
+    int shm_id = shmget(IPC_PRIVATE, MAX_CLIENTS * sizeof(int), IPC_CREAT | 0600);
+    int *msg_q_ids = (int *)shmat(shm_id, 0, 0);
     for(int i = 0; i < MAX_CLIENTS; i++){
         msg_q_ids[i] = 0;
     }
@@ -42,14 +42,14 @@ int main() {
 
     Map * shar_mem_map = createSharedMemoryMap();
 
-    int sem_group_id = semaphoreCreateGroup(1);
+    int sem_group_id = semaphore_create_group(1);
     if (sem_group_id == -1) {
         perror ("Die Gruppe konnte nicht angelegt werden!");
         exit(EXIT_FAILURE);
     }
 
     // Anschließend wird der Semaphor auf 1 gesetzt
-    semaphoreSetValue(sem_group_id, 0, 1);
+    semaphore_set_value(sem_group_id, 0, 1);
 
     printf("Server listening on port %d...\n", PORT);
 
@@ -81,11 +81,13 @@ int main() {
                 perror("Fehler beim erstellen der Nachrichtenschlange!");
                 exit(1);
             }
-            int i = 0;
-            while(i < MAX_CLIENTS && msg_q_ids[i]!=0){
-                i++;
+
+            // Each client gets their own queue
+            int client_count = 0;
+            while(client_count < MAX_CLIENTS && msg_q_ids[client_count] != 0){
+                client_count++;
             }
-            msg_q_ids[i] = msg_q_id;
+            msg_q_ids[client_count] = msg_q_id;
 
             // Child process
             close(server_socket); // Close server socket in child process
@@ -93,9 +95,6 @@ int main() {
             // Handle client in child process
             handle_client(client_socket, shar_mem_map, sem_group_id, &inTransaction, msg_q_id, msg_q_ids);
 
-            // Close client socket and exit child process
-            close(client_socket);
-            exit(EXIT_SUCCESS);
         } else {
             // Parent process
             close(client_socket); // Close client socket in parent process
