@@ -227,6 +227,9 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         map_delete_element(map, key);
         printf("Deleted: %s.\n\r",key);
 
+        //send msg
+        int rc = messageSendToAllPUT(msg_q_id, msg_q_ids, key, "DELETED");
+
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
         sprintf(buffer, "Deleted %s from the Map\n\r", key);
