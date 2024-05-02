@@ -15,7 +15,9 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
     // Send initial message to client
     writeConnectionMessage(client_socket);
 
-    //NEW
+    //sub list shard
+    SubscriptionArray * sub_list = createSharedSubscriptionArray();
+
     pid_t pid = fork();
     if (pid < 0) {
         perror("Fehler beim Forken");
@@ -54,7 +56,7 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
                     printf("Received complete input from client: %s\n", full_input);
 
                     // Write response to client
-                    char *result = handle_command(map, full_input, sem_group_id, inTransaction, msg_q_id, msg_q_ids);
+                    char *result = handle_command(map, full_input, sem_group_id, inTransaction, msg_q_id, msg_q_ids, sub_list);
                     //destroy socket if demanded
                     if (strcmp(result, "QUIT") == 0) {
                         write(client_socket, "Connection closed!", 18);
@@ -67,53 +69,6 @@ void handle_client(int client_socket, Map *map, int sem_group_id, bool* inTransa
             }
         }
     }
-    //NEW END
-
-    // Receive data from client and process it
-    /*
-    while ((bytes_read = read(client_socket, in, BUFFER_SIZE))) {
-        if(bytes_read > 0){
-
-            // Add received data to full_input
-            strncpy(full_input + input_length, in, bytes_read);
-            input_length += bytes_read;
-
-            // Check if the last character is a newline
-            if (in[bytes_read - 1] == '\n') {
-                // Remove trailing "\r\n" characters
-                if (input_length >= 2 && full_input[input_length - 2] == '\r' && full_input[input_length - 1] == '\n') {
-                    full_input[input_length - 2] = '\0'; // Replace '\r' with '\0'
-                    full_input[input_length - 1] = '\0'; // Replace '\n' with '\0'
-                    input_length -= 2; // Adjust input length
-                }
-
-                // Print received command and handle it
-                printf("Received complete input from client: %s\n", full_input);
-
-                // Write response to client
-                char *result = handle_command(map, full_input, sem_group_id, inTransaction, msg_q_id, msg_q_ids);
-                //destroy socket if demanded
-                if (strcmp(result,"QUIT") == 0) {
-                    write(client_socket, "Connection closed!", 18);
-                    close(client_socket);
-                }
-                write(client_socket, result, strlen(result)); // Send result to client
-                free(result); // Free dynamically allocated result
-                input_length = 0; // Reset input_length for next command
-            }
-        }
-        //
-        {
-            char * receivedContent = receiveMessageContent(msg_q_id);
-            if (strlen(receivedContent) > 0) {
-                write(client_socket, receivedContent, strlen(receivedContent));
-                printf("Received message content: %s\n", receivedContent);
-            } else {
-                printf("Received empty message.\n");
-            }
-        }
-    }
-    */
 
     // Close client socket
     close(client_socket);
@@ -201,7 +156,7 @@ char** splitByWhiteSpace(const char* command, int* numSubarrays) {
     return result;
 }
 
-char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTransaction, int msg_q_id, int * msg_q_ids) {
+char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTransaction, int msg_q_id, int * msg_q_ids, SubscriptionArray * sub_list) {
 
     //split the command
     int numSubarrays;
@@ -347,6 +302,8 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
     }
     else if(strcmp(method,"SUB") == 0){
         const char* key = subarrays[1];
+
+        addSubscription(sub_list, key);
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
