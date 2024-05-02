@@ -331,7 +331,7 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
 
         //return value
         char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
-        sprintf(buffer, "Unsubing all");
+        sprintf(buffer, "Unsubing all\n\r");
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
     }
