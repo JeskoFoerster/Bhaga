@@ -90,7 +90,8 @@ void writeConnectionMessage(int client_socket) {
                          "BEG -> Begins a exclusive transaction\n\r"
                          "END -> Ends a exclusive transaction\n\r"
                          "SUB <key> -> Subscribe to a key\n\r"
-                         "UNSUB <key> -> Unsubscribe a key\n\r"
+                         "UNSUB <key> -> Unsubscribe from a key\n\r"
+                         "UNSUBALL -> Unsubscribe from all keys\n\r"
                          "\n";
 
     write(client_socket, overview, strlen(overview));
@@ -324,6 +325,16 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
         char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
         strcpy(result, buffer); // Copy the formatted string into the allocated memory
     }
+    else if(strcmp(method,"UNSUBALL\n\r") == 0){
+
+        clearSubscriptions(sub_list);
+
+        //return value
+        char buffer[100]; // Assuming a fixed buffer size for simplicity, adjust as needed
+        sprintf(buffer, "Unsubing all");
+        char* result = malloc(strlen(buffer) + 1); // Allocate memory for the string
+        strcpy(result, buffer); // Copy the formatted string into the allocated memory
+    }
     else if(strcmp(method,"HELP") == 0){
         char overview[1024] = "Available commands:\n\r"
                               "HELP -> Prints this information\n\r"
@@ -336,7 +347,8 @@ char* handle_command(Map *map, const char *command, int sem_group_id, bool* inTr
                               "BEG -> Begins a exclusive transaction\n\r"
                               "END -> Ends a exclusive transaction\n\r"
                               "SUB <key> -> Subscribe to a key\n\r"
-                              "UNSUB <key> -> Unsubscribe a key\n\r"
+                              "UNSUB <key> -> Unsubscribe from a key\n\r"
+                              "UNSUBALL -> Unsubscribe from all keys\n\r"
                               "\n";
         printf(overview);
 
