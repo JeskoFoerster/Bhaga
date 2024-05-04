@@ -5,7 +5,7 @@
 
 int main() {
 
-    bool inTransaction = false;
+    bool in_transaction = false;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 
@@ -93,7 +93,7 @@ int main() {
             close(server_socket); // Close server socket in child process
 
             // Handle client in child process
-            handle_client(client_socket, shar_mem_map, sem_group_id, &inTransaction, msg_q_id, msg_q_ids);
+            handle_client(client_socket, shar_mem_map, sem_group_id, &in_transaction, msg_q_id, msg_q_ids);
 
         } else {
             // Parent process

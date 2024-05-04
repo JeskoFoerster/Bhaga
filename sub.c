@@ -22,7 +22,8 @@ _Noreturn void handle_client(int client_socket, Map *map, int sem_group_id, bool
     if (pid < 0) {
         perror("Fehler beim Forken");
         exit(EXIT_FAILURE);
-    } else if (pid == 0) {
+    }
+    else if (pid == 0) {
         // Kindprozess - Empfangen von Nachrichten
         while (true) {
             {
@@ -33,7 +34,8 @@ _Noreturn void handle_client(int client_socket, Map *map, int sem_group_id, bool
                 }
             }
         }
-    } else {
+    }
+    else {
         // Elternprozess - Verarbeiten von Befehlen und Senden von Antworten
         while ((bytes_read = read(client_socket, in, BUFFER_SIZE))) {
             if (bytes_read > 0) {
